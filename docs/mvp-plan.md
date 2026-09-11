@@ -188,7 +188,7 @@ avaliação e para as capturas do artigo.
 
 ## Registro de progresso
 
-- [ ] Fatia 1 — Busca por proximidade
+- [x] Fatia 1 — Busca por proximidade
 - [ ] Fatia 2 — Páginas públicas
 - [ ] Fatia 3 — Conta do artesão
 - [ ] Fatia 4 — Onde eu vendo

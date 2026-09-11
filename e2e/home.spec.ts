@@ -34,6 +34,9 @@ test.describe('página inicial', () => {
   test('não tem violações de acessibilidade WCAG A/AA', async ({ page }) => {
     await page.goto('/')
 
+    // The map mounts only on the client; scanning before it settles would scan half a page.
+    await expect(page.getByRole('region', { name: 'Mapa dos pontos de venda' })).toBeVisible()
+
     const results = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
       .analyze()

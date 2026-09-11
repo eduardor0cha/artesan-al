@@ -12,11 +12,34 @@ export const messages = {
     description:
       'Plataforma que mostra no mapa onde encontrar artesãos e produtos artesanais de Alagoas.',
   },
+  units: {
+    meters: 'm',
+    kilometers: 'km',
+  },
   search: {
+    heading: 'Pontos de venda perto de você',
+    controls: 'Onde procurar',
     useMyLocation: 'Usar minha localização',
+    locating: 'Procurando você...',
     radius: 'Distância',
-    empty: 'Nenhum ponto de venda encontrado por perto.',
+    radiusOption: (kilometers: string) => `Até ${kilometers} km`,
+    submit: 'Buscar',
+    searchThisArea: 'Buscar nesta área',
+    resultCount: (count: number) =>
+      count === 1 ? '1 ponto de venda encontrado' : `${count} pontos de venda encontrados`,
+    empty: 'Nenhum ponto de venda encontrado por perto. Tente aumentar a distância.',
     locationDenied: 'Não conseguimos acessar sua localização. Você pode procurar pelo mapa.',
+    locationUnsupported: 'Este aparelho não informa a localização. Você pode procurar pelo mapa.',
+    map: {
+      label: 'Mapa dos pontos de venda encontrados',
+      loading: 'Carregando o mapa...',
+      listIsEquivalent: 'O mapa mostra os mesmos pontos de venda da lista.',
+      zoomIn: 'Aproximar',
+      zoomOut: 'Afastar',
+      radiusArea: 'Área da busca',
+      attribution:
+        '&copy; colaboradores do <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    },
   },
   salesPoint: {
     types: {
@@ -25,7 +48,11 @@ export const messages = {
       store: 'Loja',
       cooperative: 'Cooperativa',
     },
-    distanceAway: (km: string) => `a ${km} km de você`,
+    distanceAway: (distance: string) => `a ${distance} de você`,
+    soldBy: 'Vende aqui',
+    andMoreArtisans: (count: number) =>
+      count === 1 ? 'e mais 1 artesão' : `e mais ${count} artesãos`,
+    noArtisans: 'Ninguém vendendo aqui no momento.',
   },
   auth: {
     cpf: 'CPF',
