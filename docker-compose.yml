@@ -1,0 +1,56 @@
+services:
+  db:
+    # Multi-arch PostGIS build: the official postgis/postgis image publishes amd64 only, which
+    # breaks every Apple Silicon machine. Override with POSTGIS_IMAGE if you prefer another.
+    image: ${POSTGIS_IMAGE:-imresamu/postgis:17-3.5}
+    container_name: artesanal-db
+    environment:
+      POSTGRES_USER: artesanal
+      POSTGRES_PASSWORD: artesanal
+      POSTGRES_DB: artesanal
+    ports:
+      # 5432 is often taken by another local Postgres; override with POSTGRES_PORT if 5434 clashes.
+      - '${POSTGRES_PORT:-5434}:5432'
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U artesanal -d artesanal']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  storage:
+    image: minio/minio:latest
+    container_name: artesanal-storage
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: artesanal
+      MINIO_ROOT_PASSWORD: artesanal123
+    ports:
+      - '${MINIO_PORT:-9000}:9000'
+      - '${MINIO_CONSOLE_PORT:-9001}:9001'
+    volumes:
+      - storage-data:/data
+    healthcheck:
+      test: ['CMD', 'mc', 'ready', 'local']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # One-shot container: creates the bucket and makes product photos publicly readable,
+  # so the app never has to bootstrap its own storage on boot.
+  storage-init:
+    image: minio/mc:latest
+    depends_on:
+      storage:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://storage:9000 artesanal artesanal123 &&
+      mc mb --ignore-existing local/artesanal &&
+      mc anonymous set download local/artesanal
+      "
+
+volumes:
+  db-data:
+  storage-data:

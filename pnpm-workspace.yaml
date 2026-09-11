@@ -1,0 +1,11 @@
+allowBuilds:
+  sharp: false
+  unrs-resolver: false
+  # esbuild fetches its platform binary in a postinstall script; without it tsx/vitest/drizzle-kit
+  # fail to start.
+  esbuild: true
+  # Optional native accelerators pulled in by testcontainers' SSH transport. Their JS fallbacks are
+  # enough for talking to a local Docker daemon.
+  cpu-features: false
+  ssh2: false
+  protobufjs: false

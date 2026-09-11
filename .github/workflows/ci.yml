@@ -1,0 +1,102 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Official postgis/postgis publishes amd64 only; this multi-arch build works on every runner.
+  POSTGIS_IMAGE: imresamu/postgis:17-3.5
+
+jobs:
+  quality:
+    name: Lint, types and unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Formatting
+        run: pnpm format:check
+
+      - name: Lint (includes accessibility and architecture boundaries)
+        run: pnpm lint
+
+      - name: Types
+        run: pnpm typecheck
+
+      - name: Unit tests
+        run: pnpm test
+
+  integration:
+    name: Integration tests (PostGIS)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # Testcontainers starts its own PostGIS container against the runner's Docker daemon, so no
+      # service container is declared here.
+      - name: Integration tests
+        run: pnpm test:integration
+
+  e2e:
+    name: End-to-end and accessibility
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browser
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: E2E tests
+        run: pnpm test:e2e
+        env:
+          # The app must boot during the E2E build, so it needs a valid configuration.
+          DATABASE_URL: postgres://artesanal:artesanal@localhost:5432/artesanal
+          BETTER_AUTH_SECRET: ci-secret-with-at-least-32-characters!!
+          BETTER_AUTH_URL: http://localhost:3000
+          S3_ENDPOINT: http://localhost:9000
+          S3_REGION: us-east-1
+          S3_BUCKET: artesanal
+          S3_ACCESS_KEY_ID: artesanal
+          S3_SECRET_ACCESS_KEY: artesanal123
+          S3_PUBLIC_URL: http://localhost:9000/artesanal
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

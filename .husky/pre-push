@@ -1,0 +1,3 @@
+# Integration and E2E tests are left out on purpose: they need Docker and a build, which is too
+# slow for a push. CI runs them.
+pnpm typecheck && pnpm test

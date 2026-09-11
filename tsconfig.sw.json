@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // The service worker runs in a worker scope, not the DOM, so it needs its own libs and the
+    // Serwist globals. Kept apart from the app's tsconfig to avoid mixing DOM and WebWorker types.
+    "lib": ["esnext", "webworker"],
+    "types": ["@serwist/next/typings"]
+  },
+  "include": ["src/app/sw.ts"],
+  "exclude": []
+}

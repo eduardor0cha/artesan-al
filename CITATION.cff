@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+title: 'ArtesanAL: uma plataforma geolocalizada para divulgação de artesãos e produtos artesanais'
+message: 'Se você usar este software, por favor cite-o conforme os metadados abaixo.'
+type: software
+authors:
+  - family-names: Rocha Nunes
+    given-names: Carlos Eduardo
+    email: carlos.nunes@arapiraca.ufal.br
+    affiliation: Universidade Federal de Alagoas — Campus Arapiraca
+  - family-names: Germano Filgueiras
+    given-names: Anny Karoliny
+    email: anny.filgueiras@arapiraca.ufal.br
+    affiliation: Universidade Federal de Alagoas — Campus Arapiraca
+abstract: >-
+  Plataforma web geolocalizada para divulgação de artesãos e produtos artesanais de Alagoas,
+  construída sobre PostgreSQL/PostGIS com busca por proximidade a pontos de venda físicos.
+keywords:
+  - artesanato
+  - geolocalização
+  - PostGIS
+  - inclusão digital
+  - Alagoas
+version: 0.1.0
+date-released: '2026-09-11'
+# Pendentes: `license` (ver README) e `repository-code`, quando houver um remoto público.
