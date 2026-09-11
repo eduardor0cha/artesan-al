@@ -18,14 +18,28 @@ de `domain` e rode `pnpm lint`: deve falhar com `boundaries/dependencies`.
 
 ## Convenções de código
 
-- **Código em inglês**: tipos, funções, tabelas, colunas e rotas (`Artisan`, `SalesPoint`,
-  `sales_points`, `/sales-points`).
+- **Código em inglês**: tipos, funções, tabelas, colunas e componentes (`Artisan`, `SalesPoint`,
+  `sales_points`, `SalesPointCard`).
+- **URL pública em pt-BR**: `/artesaos/[slug]`, `/pontos-de-venda/[id]`, `/entrar`. A URL é lida e
+  compartilhada pelo visitante, então é conteúdo, não código — ver ADR 0010.
 - **Texto de interface em pt-BR**, centralizado em `src/presentation/messages/pt-BR.ts`. Nada de
   string solta em componente.
 - **Comentários em inglês**, e só onde acrescentam o que o código não diz: regra de negócio,
   trade-off, contorno de limitação de biblioteca.
 - **Value objects** são classes com construtor privado e `create` retornando `Result`;
   **entidades** são tipos `readonly`. Erros de domínio são retornados, nunca lançados.
+
+## Como as telas falam com o servidor
+
+Escrita por **Server Action**, leitura por **Server Component**. Não existe camada de API, com uma
+exceção: o Better Auth monta o próprio handler em `/api/auth/[...all]` (ADR 0009).
+
+A ação vive em `app/`, valida a entrada com zod, chama o caso de uso e traduz o `Result` em
+mensagem de tela — regra de negócio nenhuma mora ali. Como uma ação é chamável por POST direto, ela
+**sempre** reconfere a sessão: a tela que a contém não é barreira de autorização.
+
+O estado de uma busca vai na URL (`/?lat=&lng=&raio=`), não em estado de componente, para a página
+continuar renderizável no servidor e compartilhável.
 
 ## Testes
 

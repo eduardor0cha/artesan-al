@@ -3,8 +3,9 @@
 Cada arquivo registra uma decisão, o contexto em que foi tomada, as alternativas descartadas e as
 consequências. São a matéria-prima da seção de metodologia do artigo.
 
-A transcrição integral da entrevista que originou estas decisões está em
-[`0000-grilling-transcript.md`](./0000-grilling-transcript.md).
+A transcrição integral das entrevistas que originaram estas decisões está em
+[`0000-grilling-transcript.md`](./0000-grilling-transcript.md). O escopo do MVP que saiu da segunda
+rodada está fatiado em [`../mvp-plan.md`](../mvp-plan.md).
 
 | ADR                                             | Decisão                                               |
 | ----------------------------------------------- | ----------------------------------------------------- |
@@ -16,3 +17,7 @@ A transcrição integral da entrevista que originou estas decisões está em
 | [0006](./0006-clean-architecture.md)            | Clean Architecture com fronteiras impostas por lint   |
 | [0007](./0007-mapa-leaflet-osm.md)              | Leaflet + OpenStreetMap                               |
 | [0008](./0008-acessibilidade-como-requisito.md) | Acessibilidade como requisito verificável             |
+| [0009](./0009-server-actions.md)                | Server Actions para escrita, sem camada de API        |
+| [0010](./0010-urls-em-pt-br.md)                 | URLs públicas em pt-BR, código em inglês              |
+| [0011](./0011-divulgacao-nao-marketplace.md)    | Contato por WhatsApp, fora do sistema                 |
+| [0012](./0012-registro-sicab-opcional.md)       | Registro SICAB opcional, sem selo de verificado       |

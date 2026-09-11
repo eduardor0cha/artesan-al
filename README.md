@@ -11,8 +11,9 @@ divulgação de artesãos e produtos artesanais"**.
 
 > **Estado atual: andaime.** A infraestrutura está montada e verificada de ponta a ponta, mas as
 > funcionalidades de produto (busca no mapa, painel do artesão, catálogo) ainda não foram
-> construídas. As decisões que guiaram a base estão em [`docs/adr/`](./docs/adr/), e a entrevista
-> integral que as originou em
+> construídas. O caminho até elas está fatiado em [`docs/mvp-plan.md`](./docs/mvp-plan.md). As
+> decisões que guiaram a base estão em [`docs/adr/`](./docs/adr/), e as entrevistas integrais que
+> as originaram em
 > [`docs/adr/0000-grilling-transcript.md`](./docs/adr/0000-grilling-transcript.md).
 
 ## Requisitos

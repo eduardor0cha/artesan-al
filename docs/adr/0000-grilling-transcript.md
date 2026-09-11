@@ -292,3 +292,171 @@ geolocalizada para divulgação de artesãos e produtos artesanais"**.
 | Hospedagem                            | Quando houver avaliação com artesãos reais |
 | Recuperação de senha por OTP/WhatsApp | Quando houver verba para provedor de SMS   |
 | Storybook                             | Depois que existirem telas                 |
+
+---
+
+# Segunda rodada — escopo do MVP
+
+Entrevista de 11 de setembro de 2026, com o andaime pronto e nenhuma funcionalidade construída.
+O resultado está fatiado em [`../mvp-plan.md`](../mvp-plan.md).
+
+---
+
+## 25. Escopo do MVP
+
+**Pergunta:** O que o MVP precisa demonstrar de ponta a ponta para servir de artefato do artigo?
+
+**Alternativas:** Ciclo completo artesão→visitante · Só o lado do visitante · Ciclo completo + moderação
+
+**Resposta:** **Ciclo completo artesão→visitante.** A moderação fica fora do MVP.
+
+---
+
+## 26. Ordem das fatias
+
+**Pergunta:** Qual fatia vem primeiro, sabendo que a primeira é a que valida a fiação inteira?
+
+**Alternativas:** Busca pública primeiro · Auth e cadastro primeiro · Camada por camada
+
+**Resposta:** **Busca pública primeiro** — exercita logo PostGIS ↔ Drizzle ↔ tela, que é o risco registrado na decisão 21
+
+---
+
+## 27. Tela inicial do visitante
+
+**Pergunta:** Mapa ou lista primeiro, dado o aparelho de entrada em rede ruim?
+
+**Alternativas:** Lista no servidor + mapa ao lado · Mapa em tela cheia · Só lista
+
+**Resposta:** **Lista renderizada no servidor como fonte da verdade**, mapa carregado depois como componente cliente e atrás de um botão no celular
+
+---
+
+## 28. Centro da busca sem GPS
+
+**Pergunta:** A busca é sempre "centro + raio". De onde vem o centro quando o visitante nega a localização?
+
+**Alternativas:** Centro padrão + arrastar o mapa · Seletor de município · Campo de busca por texto
+
+**Resposta:** **Centro padrão (Maceió) e "Buscar nesta área"**, com centro e raio na URL — o que torna a página renderizável no servidor, compartilhável e testável sem simular GPS
+
+---
+
+## 29. Conteúdo do item da lista
+
+**Pergunta:** Quanto da pergunta "quem e o que se vende lá" cabe já no resultado da busca?
+
+**Alternativas:** Ponto + quem vende lá · Só o ponto · Ponto + artesãos + fotos
+
+**Resposta:** **Ponto + até três nomes de artesãos e a contagem**, por um read model próprio da busca, para não inchar o `findNearby` que também serve à checagem de duplicata
+
+---
+
+## 30. Como os formulários gravam
+
+**Pergunta:** Server Actions ou Route Handlers, revisitando a ADR 0001?
+
+**Alternativas:** Server Actions sem camada de API · Route Handlers + fetch · Os dois
+
+**Resposta:** **Server Actions, sem camada de API** → ADR 0009, que revisa parte da 0001
+
+---
+
+## 31. Língua das URLs
+
+**Pergunta:** O CONTRIBUTING manda `/sales-points`, mas o schema previa `/artesaos/maria-do-barro`. Qual vale?
+
+**Alternativas:** URLs públicas em pt-BR · URLs em inglês · Público em pt-BR e painel em inglês
+
+**Resposta:** **URLs públicas em pt-BR**, código em inglês → ADR 0010
+
+---
+
+## 32. Onboarding do artesão
+
+**Pergunta:** O que acontece logo depois de criar a conta?
+
+**Alternativas:** Cadastro curto + passos guiados · Painel com estados vazios · Formulário único
+
+**Resposta:** **Cadastro curto seguido de passos guiados**, uma pergunta por tela, com opção de pular e retomar
+
+---
+
+## 33. Fotos de produto
+
+**Pergunta:** Quanto do upload de imagem entra no MVP?
+
+**Alternativas:** Uma foto reduzida no navegador · Até cinco fotos · Sem foto
+
+**Resposta:** **Uma foto por produto**, reduzida com `canvas` antes de subir, texto alternativo obrigatório
+
+---
+
+## 34. Contato com o artesão
+
+**Pergunta:** Como o visitante fala com quem fez a peça?
+
+**Alternativas:** WhatsApp e telefone · Mensagem dentro do app · Carrinho e pedido
+
+**Resposta:** **WhatsApp e telefone, só** → ADR 0011
+
+---
+
+## 35. Páginas públicas
+
+**Pergunta:** Quais páginas existem no MVP, dado que a ADR 0001 prometeu artesãos e produtos indexáveis?
+
+**Alternativas:** Busca, artesão, ponto e produto · Sem página de produto · Só busca e artesão
+
+**Resposta:** **As quatro**, cada uma com metadata e Open Graph próprios
+
+---
+
+## 36. Verificação do artesão
+
+**Pergunta:** A ADR 0004 deixou em aberto quem atesta que a pessoa é artesã. Entra algo no MVP?
+
+**Alternativas:** Campo SICAB opcional sem selo · Nada · SICAB com selo de verificado
+
+**Resposta:** **Campo SICAB opcional, sem selo** → ADR 0012
+
+---
+
+## 37. Disciplina de teste
+
+**Pergunta:** Em que ordem o teste aparece dentro de cada fatia?
+
+**Alternativas:** Teste antes no domínio e casos de uso · Teste depois · TDD estrito inclusive em telas
+
+**Resposta:** **Teste antes onde é barato e compensa** (domínio e casos de uso); integração junto da consulta; E2E com axe fechando a fatia
+
+---
+
+## 38. Onde vive o plano
+
+**Pergunta:** Onde fica a separação das etapas?
+
+**Alternativas:** Arquivo no repositório · Issues no GitHub · Os dois
+
+**Resposta:** **Arquivo no repositório** (`docs/mvp-plan.md`)
+
+---
+
+## 39. Fechamento de cada fatia no git
+
+**Pergunta:** Como fecho cada fatia no git?
+
+**Alternativas:** Commit por fatia com autorização na hora · Sem tocar no git · Commit por fatia autorizado de uma vez
+
+**Resposta:** **Commit por fatia, autorizado de uma vez**, com mensagem convencional, após a bateria de verificação
+
+---
+
+## Achados registrados durante a entrevista
+
+- O job de E2E do CI não sobe banco algum. Passa hoje só porque a página inicial não consulta nada;
+  quebra assim que a fatia 1 entrar. Corrigir junto com ela.
+- `leaflet.markercluster`, citado na ADR 0007, não está instalado. Fica fora do MVP: quatro pontos
+  no seed não agrupam nada.
+- O tipo `Artisan` do domínio não tem `slug` nem `city`, que existem no schema. Alinhar na fatia 3,
+  junto com a coluna do SICAB.
