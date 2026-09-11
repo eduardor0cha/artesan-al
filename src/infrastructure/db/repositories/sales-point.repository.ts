@@ -1,6 +1,7 @@
 import { eq, sql } from 'drizzle-orm'
 
 import type { NearbySearch, SalesPointRepository } from '@/application/ports/sales-point.repository'
+import type { ArtisanId } from '@/domain/artisan/artisan'
 import { Coordinates } from '@/domain/sales-point/coordinates'
 import type { NearbySalesPoint, SalesPoint, SalesPointId } from '@/domain/sales-point/sales-point'
 import type { SalesPointType } from '@/domain/sales-point/sales-point-type'
@@ -75,6 +76,28 @@ export class DrizzleSalesPointRepository implements SalesPointRepository {
 
     const row = rows.at(0)
     return row ? toSalesPoint(row) : null
+  }
+
+  async findByArtisan(artisanId: ArtisanId): Promise<SalesPoint[]> {
+    const rows = await this.db.execute<SalesPointRow>(sql`
+      select
+        sales_point.id,
+        sales_point.name,
+        sales_point.type,
+        ST_Y(sales_point.location::geometry) as latitude,
+        ST_X(sales_point.location::geometry) as longitude,
+        sales_point.address,
+        sales_point.opening_hours,
+        sales_point.created_by,
+        sales_point.created_at
+      from sales_points sales_point
+      join artisan_sales_points link on link.sales_point_id = sales_point.id
+      -- A null end date is what marks a link as current; past seasons stay as history.
+      where link.artisan_id = ${artisanId} and link.ends_on is null
+      order by sales_point.name
+    `)
+
+    return rows.map(toSalesPoint)
   }
 
   async save(salesPoint: SalesPoint): Promise<void> {

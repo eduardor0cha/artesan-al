@@ -53,6 +53,51 @@ export const messages = {
     andMoreArtisans: (count: number) =>
       count === 1 ? 'e mais 1 artesão' : `e mais ${count} artesãos`,
     noArtisans: 'Ninguém vendendo aqui no momento.',
+    address: 'Endereço',
+    openingHours: 'Quando abre',
+    whoSellsHere: 'Quem vende aqui',
+    mapLabel: 'Mapa do ponto de venda',
+    seeArtisan: (name: string) => `Ver a página de ${name}`,
+    metaDescription: (name: string, type: string) =>
+      `${type} em Alagoas: ${name}. Veja quem vende ali e como falar com cada artesão.`,
+  },
+  artisan: {
+    craft: 'Ofício',
+    city: 'Cidade',
+    story: 'História',
+    sicab: 'Registro de artesão (SICAB)',
+    catalogue: 'Peças',
+    emptyCatalogue: 'Este artesão ainda não publicou nenhuma peça.',
+    whereToFind: 'Onde encontrar',
+    noSalesPoints: 'Este artesão ainda não informou onde vende.',
+    contact: 'Contato',
+    metaDescription: (name: string, craft: string | null, city: string | null) =>
+      [name, craft, city].filter(Boolean).join(' — ') +
+      '. Veja as peças, onde encontrar e como falar direto com quem faz.',
+  },
+  product: {
+    madeBy: 'Quem fez',
+    priceOnRequest: 'Preço a combinar',
+    about: 'Sobre a peça',
+    whereToBuy: 'Onde comprar',
+    noPhoto: 'Esta peça ainda não tem foto.',
+    seeProduct: (name: string) => `Ver a peça ${name}`,
+    metaDescription: (name: string, artisanName: string) =>
+      `${name}, feita à mão por ${artisanName}. Fale direto com quem faz e saiba onde comprar.`,
+  },
+  whatsApp: {
+    talk: 'Falar no WhatsApp',
+    aboutProduct: (productName: string, artisanName: string) =>
+      `Olá, ${artisanName}! Vi a peça "${productName}" no ArtesanAL e queria saber mais.`,
+    aboutArtisan: (artisanName: string) =>
+      `Olá, ${artisanName}! Vi seu trabalho no ArtesanAL e queria saber mais.`,
+  },
+  navigation: {
+    backToSearch: 'Voltar para a busca',
+  },
+  notFound: {
+    title: 'Página não encontrada',
+    description: 'O endereço que você abriu não existe ou foi removido.',
   },
   auth: {
     cpf: 'CPF',

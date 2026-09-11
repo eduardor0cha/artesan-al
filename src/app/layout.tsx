@@ -1,11 +1,14 @@
 import { SerwistProvider } from '@serwist/next/react'
 import type { Metadata, Viewport } from 'next'
 
+import { publicEnv } from '@/infrastructure/config/env'
 import { messages } from '@/presentation/messages/pt-BR'
 
 import './globals.css'
 
 export const metadata: Metadata = {
+  // Public pages get shared over WhatsApp, and a preview needs absolute URLs to resolve against.
+  metadataBase: new URL(publicEnv.appUrl),
   title: {
     default: `${messages.app.name} — ${messages.app.tagline}`,
     template: `%s — ${messages.app.name}`,

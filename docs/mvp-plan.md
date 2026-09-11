@@ -116,8 +116,9 @@ Open Graph próprio — o link precisa ficar apresentável quando alguém o cola
   de quem não está autenticado.
 - `domain/artisan/slug.ts` e `domain/artisan/phone.ts` — value objects com teste. O slug nasce do
   nome e precisa ser único; o telefone valida celular brasileiro com DDD.
-- Migração `0002`: coluna opcional `sicab_number` em `artisans`.
-- Alinhar o tipo `Artisan` do domínio com o schema — hoje faltam `slug`, `city` e o SICAB.
+- ~~Migração `0002`: coluna opcional `sicab_number` em `artisans`~~ e ~~alinhar o tipo `Artisan` do
+  domínio com o schema~~ — os dois vieram na fatia 2, que precisava deles para montar a página
+  pública do artesão sem carregar o CPF junto.
 - Casos de uso `sign-up-artisan` (cria o usuário no Better Auth com `username` = CPF, e-mail
   sintético `<cpf>@local.artesanal`, telefone de recuperação, e a linha em `artisans`) e
   `request-password-otp`.
@@ -189,7 +190,7 @@ avaliação e para as capturas do artigo.
 ## Registro de progresso
 
 - [x] Fatia 1 — Busca por proximidade
-- [ ] Fatia 2 — Páginas públicas
+- [x] Fatia 2 — Páginas públicas
 - [ ] Fatia 3 — Conta do artesão
 - [ ] Fatia 4 — Onde eu vendo
 - [ ] Fatia 5 — Catálogo

@@ -1,7 +1,4 @@
 import type { NearbySalesPointSummary } from '@/application/ports/sales-point-search.query'
-import { SearchNearbySalesPoints } from '@/application/sales-point/search-nearby-sales-points'
-import { db } from '@/infrastructure/db/client'
-import { DrizzleSalesPointSearchQuery } from '@/infrastructure/db/queries/sales-point-search.query'
 import { NearbySalesPointsMap } from '@/presentation/components/search/nearby-sales-points-map'
 import { RadiusFilter } from '@/presentation/components/search/radius-filter'
 import { SalesPointCard } from '@/presentation/components/search/sales-point-card'
@@ -9,11 +6,10 @@ import { UseMyLocationButton } from '@/presentation/components/search/use-my-loc
 import { parseSearchQuery } from '@/presentation/lib/search-url'
 import { messages } from '@/presentation/messages/pt-BR'
 
-export default async function Home(props: PageProps<'/'>) {
-  // The composition root: this is the only layer allowed to hand a concrete query to a use case.
-  const searchNearbySalesPoints = new SearchNearbySalesPoints(new DrizzleSalesPointSearchQuery(db))
+import { searchNearbySalesPoints } from './composition'
 
-  const result = await searchNearbySalesPoints.execute(parseSearchQuery(await props.searchParams))
+export default async function Home(props: PageProps<'/'>) {
+  const result = await searchNearbySalesPoints().execute(parseSearchQuery(await props.searchParams))
 
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-8">

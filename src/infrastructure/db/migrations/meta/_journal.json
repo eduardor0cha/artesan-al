@@ -15,6 +15,13 @@
       "when": 1789132018167,
       "tag": "0001_initial_schema",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789158807751,
+      "tag": "0002_artisan_sicab_number",
+      "breakpoints": true
     }
   ]
 }

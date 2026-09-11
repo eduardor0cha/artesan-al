@@ -21,6 +21,12 @@ export const artisans = pgTable(
     story: text('story'),
     craft: text('craft'),
     city: text('city'),
+    /**
+     * SICAB register, optional and self-declared. Displayed as information only — the platform
+     * verifies nothing, so it never becomes a badge (ADR 0012). As a civil identifier it follows
+     * the CPF's LGPD rule for logging.
+     */
+    sicabNumber: text('sicab_number'),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },

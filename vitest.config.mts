@@ -4,8 +4,8 @@ import { defineConfig } from 'vitest/config'
 /**
  * Two projects, matching the test strategy:
  *
- * - `unit` covers domain and application. They are pure, so these run in milliseconds with no
- *   Docker and no mocks worth the name.
+ * - `unit` covers domain, application and the pure helpers in presentation. They are pure, so these
+ *   run in milliseconds with no Docker and no mocks worth the name.
  * - `integration` covers repositories against a real PostGIS container. ST_DWithin and the GiST
  *   index cannot be mocked without testing nothing at all, so these are worth their slowness.
  */
@@ -22,7 +22,7 @@ export default defineConfig({
         test: {
           name: 'unit',
           environment: 'node',
-          include: ['src/{domain,application,infrastructure}/**/*.test.ts'],
+          include: ['src/{domain,application,infrastructure,presentation}/**/*.test.ts'],
           exclude: ['**/*.integration.test.ts'],
         },
       },

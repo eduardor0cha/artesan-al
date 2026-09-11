@@ -23,6 +23,8 @@ const seedData = [
       craft: 'Cerâmica utilitária',
       city: 'Arapiraca',
       story: 'Trabalha com barro do Agreste há mais de trinta anos, ensinando o ofício às filhas.',
+      // Self-declared and unverified, like every SICAB number here (ADR 0012).
+      sicabNumber: 'AL-2018-0413',
     },
     salesPoint: {
       name: 'Feira do Artesanato de Arapiraca',
@@ -53,6 +55,7 @@ const seedData = [
       craft: 'Renda filé',
       city: 'Marechal Deodoro',
       story: 'Herdou o filé da mãe e mantém o ponto tradicional da lagoa Manguaba.',
+      sicabNumber: 'AL-2015-0097',
     },
     salesPoint: {
       name: 'Mercado de Artesanato de Marechal Deodoro',

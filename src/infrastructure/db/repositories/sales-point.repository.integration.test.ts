@@ -137,6 +137,40 @@ describe('DrizzleSalesPointRepository', () => {
     expect(names).not.toContain('Mercado do Artesanato de Maceió')
   })
 
+  it('lists where an artisan sells today, leaving out a season that has ended', async () => {
+    const current = '44444444-4444-4444-8444-444444444444'
+    const past = '55555555-5555-4555-8555-555555555555'
+
+    for (const [id, name] of [
+      [current, 'Feira onde ainda vende'],
+      [past, 'Feira de onde já saiu'],
+    ] as const) {
+      await repository.save({
+        id,
+        name,
+        type: 'fair',
+        coordinates: arapiracaCentre,
+        address: null,
+        openingHours: null,
+        createdBy: someArtisan,
+        createdAt: new Date(),
+      })
+    }
+
+    await db.execute(sql`
+      insert into artisan_sales_points (artisan_id, sales_point_id)
+      values (${someArtisan}, ${current})
+    `)
+    await db.execute(sql`
+      insert into artisan_sales_points (artisan_id, sales_point_id, ends_on)
+      values (${someArtisan}, ${past}, now())
+    `)
+
+    const points = await repository.findByArtisan(someArtisan)
+
+    expect(points.map((point) => point.name)).toEqual(['Feira onde ainda vende'])
+  })
+
   it('uses the GiST index rather than scanning the table', async () => {
     // Without this, Postgres prefers a sequential scan on a tiny table and the assertion would be
     // testing nothing.

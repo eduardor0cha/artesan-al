@@ -1,0 +1,1 @@
+ALTER TABLE "artisans" ADD COLUMN "sicab_number" text;

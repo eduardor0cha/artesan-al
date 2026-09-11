@@ -3,14 +3,18 @@
 Reusable React: components, hooks and the message catalogue. No business rules, no database, no
 `infrastructure` imports — a component receives data and callbacks and renders them.
 
-| Directory            | Holds                                                                |
-| -------------------- | -------------------------------------------------------------------- |
-| `components/ui/`     | Primitives in the shadcn/ui style, owned here and free to adapt      |
-| `components/search/` | The proximity search: result card, radius filter and the Leaflet map |
-| `components/forms/`  | Form fields shared by the artisan's panel                            |
-| `hooks/`             | Client-side behaviour, such as reading the device location           |
-| `lib/`               | Small pure helpers: class merging, distance formatting, search URLs  |
-| `messages/`          | Every user-facing string, in pt-BR                                   |
+| Directory                 | Holds                                                                |
+| ------------------------- | -------------------------------------------------------------------- |
+| `components/ui/`          | Primitives in the shadcn/ui style, owned here and free to adapt      |
+| `components/search/`      | The proximity search: result card, radius filter and the Leaflet map |
+| `components/sales-point/` | A point as it appears in a list, and the map of a single point       |
+| `components/artisan/`     | The artisan as they appear inside someone else's page                |
+| `components/product/`     | The catalogue card                                                   |
+| `components/contact/`     | The WhatsApp button every public page leads to                       |
+| `components/forms/`       | Form fields shared by the artisan's panel                            |
+| `hooks/`                  | Client-side behaviour, such as reading the device location           |
+| `lib/`                    | Small pure helpers: class merging, distances, URLs, WhatsApp links   |
+| `messages/`               | Every user-facing string, in pt-BR                                   |
 
 ## Rules
 
