@@ -3,12 +3,12 @@ title: 'ArtesanAL: uma plataforma geolocalizada para divulgação de artesãos e
 message: 'Se você usar este software, por favor cite-o conforme os metadados abaixo.'
 type: software
 authors:
-  - family-names: Rocha Nunes
-    given-names: Carlos Eduardo
+  - family-names: Nunes
+    given-names: Carlos Eduardo Rocha
     email: carlos.nunes@arapiraca.ufal.br
     affiliation: Universidade Federal de Alagoas — Campus Arapiraca
-  - family-names: Germano Filgueiras
-    given-names: Anny Karoliny
+  - family-names: Filgueiras
+    given-names: Anny Karoliny Germano
     email: anny.filgueiras@arapiraca.ufal.br
     affiliation: Universidade Federal de Alagoas — Campus Arapiraca
 abstract: >-
