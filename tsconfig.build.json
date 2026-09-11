@@ -1,0 +1,9 @@
+{
+  // Same project as tsconfig.json, minus `.next/dev/types`. That directory is written by
+  // `next dev` and validates the routes as the dev server last saw them; when a build or a
+  // typecheck runs against it, every route resolves to `never` and the error points at generated
+  // files nobody wrote. tsconfig.json keeps it so the editor types routes during development.
+  "extends": "./tsconfig.json",
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "**/*.mts"],
+  "exclude": ["node_modules", "src/app/sw.ts"]
+}

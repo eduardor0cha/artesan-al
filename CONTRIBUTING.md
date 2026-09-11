@@ -81,3 +81,10 @@ pnpm format:check && pnpm lint && pnpm typecheck && pnpm test
 pnpm test:integration   # se mexeu em banco ou consulta
 pnpm test:e2e           # se mexeu em interface
 ```
+
+O `typecheck` e o `build` rodam sobre o `tsconfig.build.json`, que é o `tsconfig.json` sem
+`.next/types` de desenvolvimento. Esse diretório é escrito pelo `next dev` e descreve as rotas como
+o servidor de desenvolvimento as viu pela última vez; se ele ficar para trás — porque uma rota nova
+apareceu depois, ou porque o `next dev` foi interrompido no meio — o `next build` falha com
+`Failed to type check` apontando para arquivos que ninguém escreveu. Se aparecer mesmo assim,
+apague `.next/dev`.
