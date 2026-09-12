@@ -32,7 +32,7 @@ export async function signUp(page: Page, artisan: NewArtisan): Promise<void> {
   await page.getByLabel('Senha').fill(artisan.password)
 
   await page.getByRole('button', { name: 'Criar minha conta' }).click()
-  await expect(page).toHaveURL(/\/painel/)
+  await expect(page).toHaveURL(/\/painel\/onde-vendo\/novo/)
 }
 
 export async function signIn(page: Page, artisan: NewArtisan): Promise<void> {
@@ -73,6 +73,19 @@ function checkDigit(digits: number[], upTo: number): number {
   const remainder = (sum * 10) % 11
 
   return remainder === 10 ? 0 : remainder
+}
+
+/**
+ * A spot in open country between Arapiraca and the coast, at least twenty kilometres from every
+ * seeded point. It is drawn at random because the tests run on two devices in parallel and each
+ * one registers a point here: two fixed runs would land on top of each other and the screen would
+ * stop being "nothing registered around".
+ */
+export function anEmptyArea(): { latitude: string; longitude: string; query: string } {
+  const latitude = (-9.3 - Math.random() * 0.25).toFixed(5)
+  const longitude = (-36.2 - Math.random() * 0.25).toFixed(5)
+
+  return { latitude, longitude, query: `lat=${latitude}&lng=${longitude}` }
 }
 
 function generateMobile(): string {

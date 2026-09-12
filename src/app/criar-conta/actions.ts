@@ -36,5 +36,7 @@ export async function signUp(_state: ActionState, formData: FormData): Promise<A
     redirect(routes.signIn)
   }
 
-  redirect(routes.panel)
+  // Straight to the first guided step: an account with nowhere to find the artisan shows the
+  // visitor nothing, and the reward for signing up has to be immediate (ADR 0004).
+  redirect(routes.newSalesPoint)
 }

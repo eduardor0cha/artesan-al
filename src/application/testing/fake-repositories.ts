@@ -2,6 +2,7 @@ import type { Artisan, ArtisanId } from '@/domain/artisan/artisan'
 import type { Cpf } from '@/domain/artisan/cpf'
 import type { PhoneNumber } from '@/domain/artisan/phone'
 import type { Product, ProductId } from '@/domain/product/product'
+import type { Coordinates } from '@/domain/sales-point/coordinates'
 import type { NearbySalesPoint, SalesPoint, SalesPointId } from '@/domain/sales-point/sales-point'
 import { domainError, err, ok, type Result } from '@/domain/shared/result'
 
@@ -11,10 +12,11 @@ import type {
   ArtisanAccountRegistration,
   PasswordReset,
 } from '../ports/artisan-account.gateway'
+import type { ArtisanSalesPointLinkRepository } from '../ports/artisan-sales-point-link.repository'
 import type { ArtisanRepository } from '../ports/artisan.repository'
 import type { ImageStorage, StoredImage } from '../ports/image-storage'
 import type { ProductRepository } from '../ports/product.repository'
-import type { SalesPointRepository } from '../ports/sales-point.repository'
+import type { NearbySearch, SalesPointRepository } from '../ports/sales-point.repository'
 
 /**
  * In-memory ports for the unit tests of the read use cases. They hold plain arrays: a use case is
@@ -94,8 +96,22 @@ export class FakeSalesPointRepository implements SalesPointRepository {
     private readonly pointsByArtisan: Record<string, SalesPoint[]> = {},
   ) {}
 
-  findNearby(): Promise<NearbySalesPoint[]> {
-    return Promise.resolve([])
+  /**
+   * Great-circle distance instead of PostGIS. It is enough to tell "the same fair" from "the next
+   * town" — which is all the use cases decide — and the spheroid maths the database really runs is
+   * covered by the integration tests.
+   */
+  findNearby({ center, radius, limit = 50 }: NearbySearch): Promise<NearbySalesPoint[]> {
+    const nearby = this.salesPoints
+      .map((salesPoint) => ({
+        salesPoint,
+        distanceMeters: metersBetween(center, salesPoint.coordinates),
+      }))
+      .filter((found) => found.distanceMeters <= radius.meters)
+      .sort((one, other) => one.distanceMeters - other.distanceMeters)
+      .slice(0, limit)
+
+    return Promise.resolve(nearby)
   }
 
   findById(id: SalesPointId): Promise<SalesPoint | null> {
@@ -109,6 +125,20 @@ export class FakeSalesPointRepository implements SalesPointRepository {
   save(salesPoint: SalesPoint): Promise<void> {
     this.salesPoints.push(salesPoint)
     return Promise.resolve()
+  }
+}
+
+export class FakeArtisanSalesPointLinkRepository implements ArtisanSalesPointLinkRepository {
+  /** Current links only, as "artisanId:salesPointId" — the fakes have no history to keep. */
+  readonly links = new Set<string>()
+
+  link(artisanId: ArtisanId, salesPointId: SalesPointId): Promise<void> {
+    this.links.add(`${artisanId}:${salesPointId}`)
+    return Promise.resolve()
+  }
+
+  has(artisanId: ArtisanId, salesPointId: SalesPointId): boolean {
+    return this.links.has(`${artisanId}:${salesPointId}`)
   }
 }
 
@@ -164,4 +194,23 @@ export class FakeImageStorage implements ImageStorage {
   publicUrl(key: string): string {
     return `${this.baseUrl}/${key}`
   }
+}
+
+const EARTH_RADIUS_METERS = 6_371_000
+
+function metersBetween(one: Coordinates, other: Coordinates): number {
+  const latitudeDelta = toRadians(other.latitude - one.latitude)
+  const longitudeDelta = toRadians(other.longitude - one.longitude)
+
+  const haversine =
+    Math.sin(latitudeDelta / 2) ** 2 +
+    Math.cos(toRadians(one.latitude)) *
+      Math.cos(toRadians(other.latitude)) *
+      Math.sin(longitudeDelta / 2) ** 2
+
+  return 2 * EARTH_RADIUS_METERS * Math.asin(Math.sqrt(haversine))
+}
+
+function toRadians(degrees: number): number {
+  return (degrees * Math.PI) / 180
 }
