@@ -2,6 +2,7 @@ import AxeBuilder from '@axe-core/playwright'
 import { expect, test, type Page } from '@playwright/test'
 
 import { anArtisanToSignUp, signIn, signOut, signUp } from './support/artisan'
+import { alertOn } from './support/screen'
 
 /**
  * The artisan's way in: create an account with CPF and password, leave, come back, and ask for a
@@ -29,7 +30,7 @@ test.describe('conta do artesão', () => {
     await page.getByLabel('Senha').fill('outra-senha-1')
     await page.getByRole('button', { name: 'Criar minha conta' }).click()
 
-    await expect(page.getByRole('alert')).toContainText('Este CPF já tem uma conta')
+    await expect(alertOn(page)).toContainText('Este CPF já tem uma conta')
     await expect(page).toHaveURL(/\/criar-conta/)
   })
 
@@ -43,7 +44,7 @@ test.describe('conta do artesão', () => {
     await page.getByLabel('Senha').fill('senha-de-teste-1')
     await page.getByRole('button', { name: 'Criar minha conta' }).click()
 
-    await expect(page.getByRole('alert')).toContainText('não é válido')
+    await expect(alertOn(page)).toContainText('não é válido')
   })
 
   test('o painel manda para a tela de entrar quem não entrou', async ({ page }) => {
@@ -71,7 +72,7 @@ test.describe('conta do artesão', () => {
     await signOut(page)
     await signIn(page, { ...artisan, password: 'senha-errada-1' })
 
-    await expect(page.getByRole('alert')).toContainText('CPF ou senha não conferem')
+    await expect(alertOn(page)).toContainText('CPF ou senha não conferem')
   })
 
   /** The document is the login identifier: it may not reach a page, a URL or a log (LGPD). */
@@ -120,7 +121,9 @@ test.describe('conta do artesão', () => {
     await page.getByLabel('Nova senha').fill('nova-senha-1')
     await page.getByRole('button', { name: 'Salvar a nova senha' }).click()
 
-    await expect(page.getByRole('alert')).toBeVisible()
+    // The screen already carries the "code sent" notice, so the failure is asserted by what it
+    // says rather than by there being some alert on the page.
+    await expect(page.getByText('O código não confere')).toBeVisible()
   })
 
   test('as telas de conta não têm violações de acessibilidade WCAG A/AA', async ({ page }) => {

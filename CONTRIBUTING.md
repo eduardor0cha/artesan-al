@@ -52,6 +52,12 @@ continuar renderizável no servidor e compartilhável.
 Os testes de integração rodam as migrações reais, então também servem de verificação de que elas
 aplicam do zero.
 
+O E2E roda contra o banco semeado e **escreve nele**: cada teste do painel cria a própria conta e
+os próprios pontos de venda, que ficam lá depois. Por isso um teste nunca altera o que outro
+afirma — quem precisa de um ponto já cadastrado cria o seu, numa área vazia sorteada, em vez de
+reaproveitar a feira do seed. Rodando localmente várias vezes, vale um `pnpm db:seed` antes: ele
+trunca e refaz os dados de demonstração.
+
 ## Banco de dados
 
 Schema em `src/infrastructure/db/schema/`, migrações geradas com `pnpm db:generate` e versionadas

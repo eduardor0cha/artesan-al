@@ -75,17 +75,27 @@ function checkDigit(digits: number[], upTo: number): number {
   return remainder === 10 ? 0 : remainder
 }
 
+export type EmptyArea = {
+  /** The spot itself, as the panel's map would hand it over. */
+  query: string
+  /** About 55 m north of it: the same place, seen by a phone's GPS a minute later. */
+  nearbyQuery: string
+}
+
 /**
  * A spot in open country between Arapiraca and the coast, at least twenty kilometres from every
- * seeded point. It is drawn at random because the tests run on two devices in parallel and each
- * one registers a point here: two fixed runs would land on top of each other and the screen would
- * stop being "nothing registered around".
+ * seeded point. Each test draws its own and registers what it needs there, so that nothing it does
+ * changes the fixtures the public-facing specs assert on — an artisan of this suite linked to the
+ * seeded fair would push Maria do Barro out of the three names a search card shows.
  */
-export function anEmptyArea(): { latitude: string; longitude: string; query: string } {
-  const latitude = (-9.3 - Math.random() * 0.25).toFixed(5)
-  const longitude = (-36.2 - Math.random() * 0.25).toFixed(5)
+export function anEmptyArea(): EmptyArea {
+  const latitude = -9.3 - Math.random() * 0.25
+  const longitude = -36.2 - Math.random() * 0.25
 
-  return { latitude, longitude, query: `lat=${latitude}&lng=${longitude}` }
+  return {
+    query: `lat=${latitude.toFixed(5)}&lng=${longitude.toFixed(5)}`,
+    nearbyQuery: `lat=${(latitude + 0.0005).toFixed(5)}&lng=${longitude.toFixed(5)}`,
+  }
 }
 
 function generateMobile(): string {

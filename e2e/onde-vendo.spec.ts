@@ -1,24 +1,31 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test, type Page } from '@playwright/test'
 
-import { anArtisanToSignUp, anEmptyArea, signUp } from './support/artisan'
+import { anArtisanToSignUp, anEmptyArea, signOut, signUp, type EmptyArea } from './support/artisan'
+import { alertOn } from './support/screen'
 
 /**
- * Marking where an artisan sells, against the seeded database. The spot travels in the query
- * string exactly as the map would send it, so the flow is exercised without simulating a drag.
+ * Marking where an artisan sells. The spot travels in the query string exactly as the map would
+ * send it, so the flow is exercised without simulating a drag.
+ *
+ * Every point these tests need is registered by the tests themselves, in an empty area of their
+ * own: reusing the seeded fair would mean this suite quietly rewriting who sells there, which is
+ * what the public search and the point's own page assert on.
  */
 
-/** About 55 m north of the seeded Feira do Artesanato de Arapiraca. */
-const NEXT_TO_THE_FAIR = '?lat=-9.75140&lng=-36.66140'
-
-const FAIR = 'Feira do Artesanato de Arapiraca'
+type RegisteredPoint = {
+  name: string
+  area: EmptyArea
+}
 
 test.describe('onde eu vendo', () => {
-  test('a feira já cadastrada é oferecida antes de deixar criar outra', async ({ page }) => {
-    await signUp(page, anArtisanToSignUp())
-    await page.goto(`/painel/onde-vendo/novo${NEXT_TO_THE_FAIR}`)
+  test('um ponto já cadastrado é oferecido antes de deixar criar outro', async ({ page }) => {
+    const point = await aPointRegisteredByAnotherArtisan(page)
 
-    await expect(page.getByRole('heading', { name: FAIR })).toBeVisible()
+    await signUp(page, anArtisanToSignUp())
+    await page.goto(`/painel/onde-vendo/novo?${point.area.nearbyQuery}`)
+
+    await expect(page.getByRole('heading', { name: point.name })).toBeVisible()
     await expect(page.getByRole('button', { name: 'Vendo aqui' })).toBeVisible()
 
     // The form for a new point stays out of reach until the artisan says none of these is theirs.
@@ -26,24 +33,24 @@ test.describe('onde eu vendo', () => {
     await expect(page.getByRole('link', { name: /Nenhum é o meu ponto/ })).toBeVisible()
   })
 
-  test('quem reaproveita a feira passa a aparecer na página dela', async ({ page }) => {
+  test('quem reaproveita o ponto passa a aparecer na página dele', async ({ page }) => {
+    const point = await aPointRegisteredByAnotherArtisan(page)
     const artisan = anArtisanToSignUp()
 
     await signUp(page, artisan)
-    await page.goto(`/painel/onde-vendo/novo${NEXT_TO_THE_FAIR}`)
+    await page.goto(`/painel/onde-vendo/novo?${point.area.nearbyQuery}`)
     await page.getByRole('button', { name: 'Vendo aqui' }).click()
 
     await expect(page).toHaveURL(/\/painel\/onde-vendo/)
-    await expect(page.getByRole('alert')).toContainText(FAIR)
-    await expect(page.getByRole('link', { name: FAIR })).toBeVisible()
+    await expect(alertOn(page)).toContainText(point.name)
+    await expect(page.getByRole('link', { name: point.name })).toBeVisible()
 
-    // The same fair on the visitor's side now lists the artisan among who sells there.
-    await page.getByRole('link', { name: FAIR }).click()
+    // The same point on the visitor's side now lists the artisan among who sells there.
+    await page.getByRole('link', { name: point.name }).click()
     await expect(page.getByRole('link', { name: `Ver a página de ${artisan.name}` })).toBeVisible()
   })
 
   test('o ponto novo cadastrado no painel aparece na busca do visitante', async ({ page }) => {
-    const pointName = `Feira de Teste ${Math.random().toString(36).slice(2, 8)}`
     const area = anEmptyArea()
 
     await signUp(page, anArtisanToSignUp())
@@ -52,30 +59,28 @@ test.describe('onde eu vendo', () => {
     await page.goto(`/painel/onde-vendo/novo?${area.query}`)
     await expect(page.getByText('Nenhum ponto cadastrado aqui perto.')).toBeVisible()
 
-    await page.getByLabel('Nome do ponto').fill(pointName)
-    await page.getByLabel('Tipo do ponto').selectOption('fair')
-    await page.getByLabel(/Endereço/).fill('Estrada velha, sem número')
-    await page.getByRole('button', { name: 'Cadastrar ponto' }).click()
+    const name = await registerPointHere(page, 'Estrada velha, sem número')
 
     await expect(page).toHaveURL(/\/painel\/onde-vendo/)
-    await expect(page.getByRole('link', { name: pointName })).toBeVisible()
+    await expect(page.getByRole('link', { name })).toBeVisible()
 
     await page.goto(`/?${area.query}&raio=10`)
-    await expect(page.getByRole('link', { name: pointName })).toBeVisible()
+    await expect(page.getByRole('link', { name })).toBeVisible()
   })
 
   test('o mesmo ponto não é vinculado duas vezes', async ({ page }) => {
+    const point = await aPointRegisteredByAnotherArtisan(page)
+
     await signUp(page, anArtisanToSignUp())
-
-    await page.goto(`/painel/onde-vendo/novo${NEXT_TO_THE_FAIR}`)
+    await page.goto(`/painel/onde-vendo/novo?${point.area.nearbyQuery}`)
     await page.getByRole('button', { name: 'Vendo aqui' }).click()
-    await expect(page.getByRole('link', { name: FAIR })).toBeVisible()
+    await expect(page.getByRole('link', { name: point.name })).toBeVisible()
 
-    await page.goto(`/painel/onde-vendo/novo${NEXT_TO_THE_FAIR}`)
+    await page.goto(`/painel/onde-vendo/novo?${point.area.nearbyQuery}`)
     await expect(page.getByText('Você já vende aqui')).toBeVisible()
 
     await page.goto('/painel/onde-vendo')
-    await expect(page.getByRole('link', { name: FAIR })).toHaveCount(1)
+    await expect(page.getByRole('link', { name: point.name })).toHaveCount(1)
   })
 
   test('sem local marcado, a tela abre no mapa para escolher o ponto', async ({ page }) => {
@@ -88,20 +93,54 @@ test.describe('onde eu vendo', () => {
   })
 
   test('as telas de onde vendo não têm violações de acessibilidade WCAG A/AA', async ({ page }) => {
+    const point = await aPointRegisteredByAnotherArtisan(page)
+
     await signUp(page, anArtisanToSignUp())
 
     // The map mounts only on the client; scanning before it settles would scan half a page.
     await expect(page.getByRole('region', { name: 'Mapa para marcar o local' })).toBeVisible()
     expect(await violationsOn(page)).toEqual([])
 
-    await page.goto(`/painel/onde-vendo/novo${NEXT_TO_THE_FAIR}`)
-    await expect(page.getByRole('heading', { name: FAIR })).toBeVisible()
+    await page.goto(`/painel/onde-vendo/novo?${point.area.nearbyQuery}`)
+    await expect(page.getByRole('heading', { name: point.name })).toBeVisible()
     expect(await violationsOn(page)).toEqual([])
 
     await page.goto('/painel/onde-vendo')
     expect(await violationsOn(page)).toEqual([])
   })
 })
+
+/**
+ * A point that exists before the artisan under test arrives, with an owner of its own — reusing a
+ * point is only offered to someone who does not already sell there.
+ */
+async function aPointRegisteredByAnotherArtisan(page: Page): Promise<RegisteredPoint> {
+  const area = anEmptyArea()
+
+  await signUp(page, anArtisanToSignUp())
+  await page.goto(`/painel/onde-vendo/novo?${area.query}`)
+
+  const name = await registerPointHere(page)
+
+  await expect(page.getByRole('link', { name })).toBeVisible()
+  await signOut(page)
+
+  return { name, area }
+}
+
+/** Fills the new-point form on the screen already open at the chosen spot. */
+async function registerPointHere(page: Page, address?: string): Promise<string> {
+  const name = `Ponto de Teste ${Math.random().toString(36).slice(2, 8)}`
+
+  await page.getByLabel('Nome do ponto').fill(name)
+  await page.getByLabel('Tipo do ponto').selectOption('fair')
+
+  if (address) await page.getByLabel(/Endereço/).fill(address)
+
+  await page.getByRole('button', { name: 'Cadastrar ponto' }).click()
+
+  return name
+}
 
 async function violationsOn(page: Page) {
   const results = await new AxeBuilder({ page })
