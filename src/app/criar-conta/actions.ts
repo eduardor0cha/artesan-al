@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import { z } from 'zod'
 
 import { signInWithCpf } from '@/infrastructure/auth/session'
-import { actionFailed, type ActionState } from '@/presentation/lib/action-state'
+import { actionFailed, typedValues, type ActionState } from '@/presentation/lib/action-state'
 import { routes } from '@/presentation/lib/routes'
 import { messages } from '@/presentation/messages/pt-BR'
 
@@ -24,11 +24,14 @@ const signUpSchema = z.object({
 export async function signUp(_state: ActionState, formData: FormData): Promise<ActionState> {
   const input = signUpSchema.safeParse(Object.fromEntries(formData))
 
-  if (!input.success) return actionFailed(messages.auth.incompleteForm)
+  // The password is deliberately left out: it is never written back into a page.
+  const typed = typedValues(formData, ['password'])
+
+  if (!input.success) return actionFailed(messages.auth.incompleteForm, typed)
 
   const created = await signUpArtisan().execute(input.data)
 
-  if (!created.ok) return actionFailed(created.error.message)
+  if (!created.ok) return actionFailed(created.error.message, typed)
 
   // The account was just created with this pair, so a failure here is the session store, not the
   // credentials: the artisan signs in from the sign-in screen and keeps the account either way.

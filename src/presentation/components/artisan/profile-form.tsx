@@ -20,6 +20,9 @@ type ProfileFormProps = {
  */
 export function ProfileForm({ artisan, action }: ProfileFormProps) {
   const [state, submit, pending] = useActionState(action, IDLE_ACTION)
+  // React empties an uncontrolled form once the action settles, and a story written on a phone is
+  // not typed twice: a refusal hands back what was there.
+  const typed = state.values
 
   return (
     <form action={submit} className="flex flex-col gap-4">
@@ -33,14 +36,14 @@ export function ProfileForm({ artisan, action }: ProfileFormProps) {
         name="craft"
         label={`${messages.panel.profile.craft} (${messages.panel.optional})`}
         hint={messages.panel.profile.craftHint}
-        defaultValue={artisan.craft ?? undefined}
+        defaultValue={typed?.craft ?? artisan.craft ?? undefined}
       />
 
       <TextField
         id="artisan-city"
         name="city"
         label={`${messages.panel.profile.city} (${messages.panel.optional})`}
-        defaultValue={artisan.city ?? undefined}
+        defaultValue={typed?.city ?? artisan.city ?? undefined}
       />
 
       <div className="flex flex-col gap-1">
@@ -54,7 +57,7 @@ export function ProfileForm({ artisan, action }: ProfileFormProps) {
           id="artisan-story"
           name="story"
           rows={5}
-          defaultValue={artisan.story ?? undefined}
+          defaultValue={typed?.story ?? artisan.story ?? undefined}
           aria-describedby="artisan-story-hint"
           className="rounded-lg border border-stone-400 bg-white px-3 py-2 text-base text-stone-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
         />
@@ -67,7 +70,7 @@ export function ProfileForm({ artisan, action }: ProfileFormProps) {
         inputMode="numeric"
         label={messages.panel.profile.publicPhone}
         hint={messages.panel.profile.publicPhoneHint}
-        defaultValue={artisan.publicPhone}
+        defaultValue={typed?.publicPhone ?? artisan.publicPhone}
         required
       />
 
@@ -76,7 +79,7 @@ export function ProfileForm({ artisan, action }: ProfileFormProps) {
         name="sicabNumber"
         label={`${messages.panel.profile.sicab} (${messages.panel.optional})`}
         hint={messages.panel.profile.sicabHint}
-        defaultValue={artisan.sicabNumber ?? undefined}
+        defaultValue={typed?.sicabNumber ?? artisan.sicabNumber ?? undefined}
       />
 
       <Button type="submit" size="large" disabled={pending}>

@@ -32,7 +32,7 @@ test.describe('catálogo', () => {
 
     const piece = await publishAPiece(page, { price: '85,00' })
 
-    await expect(page).toHaveURL(/\/painel\/produtos/)
+    await expect(page).toHaveURL(/\/painel\/produtos(\?|$)/)
     await expect(alertOn(page)).toContainText(piece)
 
     // The artisan's own public page, reached the way they reach it: from the panel header.
@@ -113,7 +113,7 @@ test.describe('catálogo', () => {
     await page.getByLabel(/Preço em reais/).fill('')
     await page.getByRole('button', { name: 'Publicar peça' }).click()
 
-    await expect(page).toHaveURL(/\/painel\/produtos/)
+    await expect(page).toHaveURL(/\/painel\/produtos(\?|$)/)
     await expect(page.getByText('Preço a combinar')).toBeVisible()
   })
 
@@ -152,7 +152,7 @@ async function publishAPiece(page: Page, options: { price?: string } = {}): Prom
   await page.getByLabel('Descreva a foto').fill(ALT)
   await page.getByRole('button', { name: 'Publicar peça' }).click()
 
-  await expect(page).toHaveURL(/\/painel\/produtos/)
+  await expect(page).toHaveURL(/\/painel\/produtos(\?|$)/)
 
   return name
 }

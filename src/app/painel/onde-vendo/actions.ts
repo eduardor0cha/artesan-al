@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { z } from 'zod'
 
-import { actionFailed, type ActionState } from '@/presentation/lib/action-state'
+import { actionFailed, typedValues, type ActionState } from '@/presentation/lib/action-state'
 import { POINT_GONE, whereISellHref } from '@/presentation/lib/panel-url'
 import { routes } from '@/presentation/lib/routes'
 import { messages } from '@/presentation/messages/pt-BR'
@@ -52,13 +52,14 @@ export async function createSalesPoint(
   formData: FormData,
 ): Promise<ActionState> {
   const artisan = await requireArtisan()
+  const typed = typedValues(formData)
   const input = newSalesPointSchema.safeParse(Object.fromEntries(formData))
 
-  if (!input.success) return actionFailed(messages.auth.incompleteForm)
+  if (!input.success) return actionFailed(messages.auth.incompleteForm, typed)
 
   const registered = await registerSalesPoint().execute({ artisanId: artisan.id, ...input.data })
 
-  if (!registered.ok) return actionFailed(registered.error.message)
+  if (!registered.ok) return actionFailed(registered.error.message, typed)
 
   revalidatePath(routes.whereISell)
   redirect(whereISellHref({ added: registered.value.id }))

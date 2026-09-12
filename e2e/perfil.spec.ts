@@ -59,7 +59,10 @@ test.describe('perfil e visão geral', () => {
   /** The address of a page is shared by hand; nothing in the panel may move it. */
   test('editar o perfil não muda o endereço da página', async ({ page }) => {
     await signUp(page, anArtisanToSignUp())
+
+    // A click resolves before the navigation it starts, so the address is read once it has landed.
     await page.getByRole('link', { name: 'Ver minha página' }).click()
+    await expect(page).toHaveURL(/\/artesaos\//)
 
     const address = page.url()
 
@@ -69,6 +72,7 @@ test.describe('perfil e visão geral', () => {
     await expect(alertOn(page)).toContainText('Perfil salvo.')
 
     await page.getByRole('link', { name: 'Ver minha página' }).click()
+    await expect(page).toHaveURL(/\/artesaos\//)
     expect(page.url()).toBe(address)
   })
 

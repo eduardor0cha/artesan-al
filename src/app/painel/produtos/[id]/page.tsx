@@ -30,7 +30,17 @@ export default async function EditProductPage(props: PageProps<'/painel/produtos
         {messages.panel.productForm.editTitle}
       </h1>
 
-      <ProductForm action={update} item={item} />
+      {/* Only plain data crosses into the form: `Price` is a class, and a class does not. */}
+      <ProductForm
+        action={update}
+        product={{
+          id: item.product.id,
+          name: item.product.name,
+          description: item.product.description,
+          priceCents: item.product.price?.cents ?? null,
+        }}
+        photo={item.photo}
+      />
 
       {/*
        * Removal is asked for twice, and the second time in its own words: it cannot be undone, and

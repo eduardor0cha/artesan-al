@@ -5,7 +5,7 @@ import { z } from 'zod'
 
 import { Cpf } from '@/domain/artisan/cpf'
 import { signInWithCpf, signOut as endSession } from '@/infrastructure/auth/session'
-import { actionFailed, type ActionState } from '@/presentation/lib/action-state'
+import { actionFailed, typedValues, type ActionState } from '@/presentation/lib/action-state'
 import { routes } from '@/presentation/lib/routes'
 import { messages } from '@/presentation/messages/pt-BR'
 
@@ -24,7 +24,8 @@ export async function signIn(_state: ActionState, formData: FormData): Promise<A
   // A CPF that is not a document cannot match any account, and saying so here saves a round trip
   // to the password hasher. The message stays the same either way.
   if (!cpf.ok || !(await signInWithCpf(cpf.value.digits, input.data.password))) {
-    return actionFailed(messages.auth.signIn.failed)
+    // The CPF comes back so only the password has to be typed again; the password never does.
+    return actionFailed(messages.auth.signIn.failed, typedValues(formData, ['password']))
   }
 
   redirect(routes.panel)

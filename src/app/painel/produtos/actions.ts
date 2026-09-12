@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation'
 import { z } from 'zod'
 
 import type { PhotoUpload } from '@/application/product/product-input'
-import { actionFailed, type ActionState } from '@/presentation/lib/action-state'
+import { actionFailed, typedValues, type ActionState } from '@/presentation/lib/action-state'
 import { myProductsHref, PRODUCT_GONE } from '@/presentation/lib/panel-url'
 import { parsePriceInput } from '@/presentation/lib/price-input'
 import { routes } from '@/presentation/lib/routes'
@@ -29,12 +29,13 @@ const removeSchema = z.object({ productId: z.uuid() })
 
 export async function publish(_state: ActionState, formData: FormData): Promise<ActionState> {
   const artisan = await requireArtisan()
+  const typed = typedValues(formData)
   const input = detailsSchema.safeParse(Object.fromEntries(formData))
 
-  if (!input.success) return actionFailed(messages.auth.incompleteForm)
+  if (!input.success) return actionFailed(messages.auth.incompleteForm, typed)
 
   const priceCents = parsePriceInput(input.data.price ?? '')
-  if (priceCents === undefined) return actionFailed(messages.panel.productForm.priceInvalid)
+  if (priceCents === undefined) return actionFailed(messages.panel.productForm.priceInvalid, typed)
 
   const published = await publishProduct().execute({
     artisanId: artisan.id,
@@ -44,7 +45,7 @@ export async function publish(_state: ActionState, formData: FormData): Promise<
     photo: await readPhoto(formData, input.data.alt ?? ''),
   })
 
-  if (!published.ok) return actionFailed(published.error.message)
+  if (!published.ok) return actionFailed(published.error.message, typed)
 
   revalidateCatalogue(artisan.slug, published.value.id)
   redirect(myProductsHref({ added: published.value.id }))
@@ -54,14 +55,15 @@ export async function update(_state: ActionState, formData: FormData): Promise<A
   // Checked here, not by the screen that drew the form: an action is reachable by a direct POST,
   // and the id of the piece travels inside it (ADR 0009).
   const artisan = await requireArtisan()
+  const typed = typedValues(formData)
   const input = detailsSchema
     .extend({ productId: z.uuid() })
     .safeParse(Object.fromEntries(formData))
 
-  if (!input.success) return actionFailed(messages.auth.incompleteForm)
+  if (!input.success) return actionFailed(messages.auth.incompleteForm, typed)
 
   const priceCents = parsePriceInput(input.data.price ?? '')
-  if (priceCents === undefined) return actionFailed(messages.panel.productForm.priceInvalid)
+  if (priceCents === undefined) return actionFailed(messages.panel.productForm.priceInvalid, typed)
 
   const saved = await updateProduct().execute({
     artisanId: artisan.id,
@@ -73,7 +75,7 @@ export async function update(_state: ActionState, formData: FormData): Promise<A
     photo: await readPhoto(formData, input.data.alt ?? ''),
   })
 
-  if (!saved.ok) return actionFailed(saved.error.message)
+  if (!saved.ok) return actionFailed(saved.error.message, typed)
 
   revalidateCatalogue(artisan.slug, saved.value.id)
   redirect(myProductsHref({ saved: saved.value.id }))

@@ -18,6 +18,9 @@ type NewSalesPointFormProps = {
 
 export function NewSalesPointForm({ latitude, longitude, action }: NewSalesPointFormProps) {
   const [state, submit, pending] = useActionState(action, IDLE_ACTION)
+  // React empties an uncontrolled form once the action settles; a refusal hands back what was
+  // typed so the artisan does not describe the place twice.
+  const typed = state.values
 
   return (
     <form action={submit} className="flex flex-col gap-4">
@@ -31,6 +34,7 @@ export function NewSalesPointForm({ latitude, longitude, action }: NewSalesPoint
         name="name"
         label={messages.panel.newSalesPoint.name}
         hint={messages.panel.newSalesPoint.nameHint}
+        defaultValue={typed?.name}
         required
       />
 
@@ -41,7 +45,7 @@ export function NewSalesPointForm({ latitude, longitude, action }: NewSalesPoint
         <select
           id="sales-point-type"
           name="type"
-          defaultValue="fair"
+          defaultValue={typed?.type ?? 'fair'}
           className="min-h-11 rounded-lg border border-stone-400 bg-white px-3 text-base text-stone-900"
         >
           {SALES_POINT_TYPES.map((type) => (
@@ -57,6 +61,7 @@ export function NewSalesPointForm({ latitude, longitude, action }: NewSalesPoint
         name="address"
         label={`${messages.panel.newSalesPoint.address} (${messages.panel.optional})`}
         hint={messages.panel.newSalesPoint.addressHint}
+        defaultValue={typed?.address}
       />
 
       <TextField
@@ -64,6 +69,7 @@ export function NewSalesPointForm({ latitude, longitude, action }: NewSalesPoint
         name="openingHours"
         label={`${messages.panel.newSalesPoint.openingHours} (${messages.panel.optional})`}
         hint={messages.panel.newSalesPoint.openingHoursHint}
+        defaultValue={typed?.openingHours}
       />
 
       <Button type="submit" size="large" disabled={pending}>

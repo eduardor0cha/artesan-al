@@ -24,6 +24,8 @@ export function SignInForm({ action }: SignInFormProps) {
         name="cpf"
         label={messages.auth.cpf}
         hint={messages.auth.cpfHint}
+        // Handed back by a refused sign-in so only the password has to be typed again.
+        defaultValue={state.values?.cpf}
         inputMode="numeric"
         autoComplete="username"
         required

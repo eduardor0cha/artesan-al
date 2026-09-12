@@ -15,6 +15,9 @@ type SignUpFormProps = {
 
 export function SignUpForm({ action }: SignUpFormProps) {
   const [state, submit, pending] = useActionState(action, IDLE_ACTION)
+  // React empties an uncontrolled form once the action settles, so a refusal hands back what was
+  // typed and the fields are seeded from it. The password is never among them.
+  const typed = state.values
 
   return (
     <form action={submit} className="flex flex-col gap-4">
@@ -25,6 +28,7 @@ export function SignUpForm({ action }: SignUpFormProps) {
         name="name"
         label={messages.auth.name}
         hint={messages.auth.nameHint}
+        defaultValue={typed?.name}
         autoComplete="name"
         required
       />
@@ -34,6 +38,7 @@ export function SignUpForm({ action }: SignUpFormProps) {
         name="cpf"
         label={messages.auth.cpf}
         hint={messages.auth.cpfHint}
+        defaultValue={typed?.cpf}
         inputMode="numeric"
         autoComplete="username"
         required
@@ -44,6 +49,7 @@ export function SignUpForm({ action }: SignUpFormProps) {
         name="phone"
         label={messages.auth.phone}
         hint={messages.auth.phoneHint}
+        defaultValue={typed?.phone}
         inputMode="tel"
         autoComplete="tel"
         required

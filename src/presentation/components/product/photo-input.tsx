@@ -16,6 +16,8 @@ const REDUCED_TYPE = 'image/jpeg'
 type PhotoInputProps = {
   /** The photo already published, shown until the artisan picks another one. */
   currentPhoto?: { url: string; alt: string } | null
+  /** The description as last typed, when a refused submit is being shown again. */
+  defaultAlt?: string
 }
 
 type Status = 'idle' | 'working' | 'ready' | 'failed'
@@ -30,7 +32,7 @@ type Status = 'idle' | 'working' | 'ready' | 'failed'
  * the field holds, so the form still posts a plain `<input type="file">` and the Server Action
  * receives it with no client-side plumbing of its own.
  */
-export function PhotoInput({ currentPhoto = null }: PhotoInputProps) {
+export function PhotoInput({ currentPhoto = null, defaultAlt }: PhotoInputProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   /** The file this component produced, to tell it apart from one the person just chose. */
   const reducedRef = useRef<File | null>(null)
@@ -127,7 +129,7 @@ export function PhotoInput({ currentPhoto = null }: PhotoInputProps) {
         name="alt"
         label={messages.panel.productForm.alt}
         hint={messages.panel.productForm.altHint}
-        defaultValue={currentPhoto?.alt}
+        defaultValue={defaultAlt ?? currentPhoto?.alt}
         required={Boolean(shown)}
       />
     </div>

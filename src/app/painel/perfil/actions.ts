@@ -3,7 +3,12 @@
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
-import { actionSucceeded, actionFailed, type ActionState } from '@/presentation/lib/action-state'
+import {
+  actionFailed,
+  actionSucceeded,
+  typedValues,
+  type ActionState,
+} from '@/presentation/lib/action-state'
 import { routes } from '@/presentation/lib/routes'
 import { messages } from '@/presentation/messages/pt-BR'
 
@@ -25,13 +30,14 @@ const profileSchema = z.object({
  */
 export async function saveProfile(_state: ActionState, formData: FormData): Promise<ActionState> {
   const artisan = await requireArtisan()
+  const typed = typedValues(formData)
   const input = profileSchema.safeParse(Object.fromEntries(formData))
 
-  if (!input.success) return actionFailed(messages.auth.incompleteForm)
+  if (!input.success) return actionFailed(messages.auth.incompleteForm, typed)
 
   const saved = await updateArtisanProfile().execute({ artisanId: artisan.id, ...input.data })
 
-  if (!saved.ok) return actionFailed(saved.error.message)
+  if (!saved.ok) return actionFailed(saved.error.message, typed)
 
   revalidatePath(routes.profile)
   revalidatePath(routes.artisan(saved.value.slug))
