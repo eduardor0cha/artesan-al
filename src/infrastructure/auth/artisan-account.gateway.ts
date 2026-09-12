@@ -27,6 +27,7 @@ const MESSAGE_BY_CODE: Record<string, string> = {
   INVALID_OTP: 'O código não confere. Confira e digite de novo.',
   OTP_EXPIRED: 'Este código venceu. Peça outro.',
   OTP_NOT_FOUND: 'Nenhum código foi pedido para este celular.',
+  TOO_MANY_ATTEMPTS: 'Você errou o código vezes demais. Peça um código novo.',
   PASSWORD_TOO_SHORT: 'A senha é curta demais.',
 }
 
