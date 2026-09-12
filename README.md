@@ -9,12 +9,29 @@ de artesanato estão perto de mim, e quem e o que se vende lá?"_.
 Este repositório é o artefato de software do artigo **"ArtesanAL: uma plataforma geolocalizada para
 divulgação de artesãos e produtos artesanais"**.
 
-> **Estado atual: andaime.** A infraestrutura está montada e verificada de ponta a ponta, mas as
-> funcionalidades de produto (busca no mapa, painel do artesão, catálogo) ainda não foram
-> construídas. O caminho até elas está fatiado em [`docs/mvp-plan.md`](./docs/mvp-plan.md). As
-> decisões que guiaram a base estão em [`docs/adr/`](./docs/adr/), e as entrevistas integrais que
-> as originaram em
+> **Estado atual: MVP completo.** O ciclo inteiro está de pé — o artesão cria a conta com CPF,
+> marca no GPS onde vende, publica peças com foto; o visitante abre o mapa, encontra o ponto e fala
+> com quem faz. As fatias e o critério de pronto de cada uma estão em
+> [`docs/mvp-plan.md`](./docs/mvp-plan.md). As decisões que guiaram a base estão em
+> [`docs/adr/`](./docs/adr/), e as entrevistas integrais que as originaram em
 > [`docs/adr/0000-grilling-transcript.md`](./docs/adr/0000-grilling-transcript.md).
+
+## As telas
+
+| Onde                      | O quê                                                                     |
+| ------------------------- | ------------------------------------------------------------------------- |
+| `/`                       | Busca por proximidade: lista ordenada por distância, com o mapa ao lado   |
+| `/pontos-de-venda/[id]`   | O ponto no mapa, quando abre, e quem vende ali                            |
+| `/artesaos/[slug]`        | A página do artesão: história, ofício, catálogo, onde encontrar, WhatsApp |
+| `/produtos/[id]`          | A peça, com foto, preço, quem fez e onde comprar                          |
+| `/criar-conta`, `/entrar` | Conta por CPF e senha; recuperação por código no celular                  |
+| `/painel`                 | Visão geral da conta do artesão                                           |
+| `/painel/perfil`          | O que o visitante lê na página dele                                       |
+| `/painel/onde-vendo`      | Marcar no GPS onde vende, reaproveitando um ponto já cadastrado           |
+| `/painel/produtos`        | Publicar, editar e tirar peças, com a foto reduzida no próprio aparelho   |
+
+O estado da busca vive na URL (`/?lat=-9.7519&lng=-36.6614&raio=10`), então qualquer tela pública
+é compartilhável por WhatsApp e renderiza sem JavaScript.
 
 ## Requisitos
 
@@ -36,6 +53,19 @@ pnpm dev
 
 A aplicação sobe em <http://localhost:3000>. O console do MinIO fica em <http://localhost:9001>
 (usuário `artesanal`, senha `artesanal123`).
+
+### Demonstrando o lado do artesão
+
+O seed cria uma conta com credenciais conhecidas. Entre em <http://localhost:3000/entrar> com:
+
+| CPF           | Senha          |
+| ------------- | -------------- |
+| `11144477735` | `artesanal123` |
+
+É a conta de Maria do Barro, que já vende na Feira do Artesanato de Arapiraca e tem duas peças
+publicadas — o painel abre com conteúdo em vez de vazio. As credenciais estão em
+[`src/infrastructure/db/demo-account.ts`](./src/infrastructure/db/demo-account.ts), são escritas só
+por `pnpm db:seed` e não servem para nenhum ambiente publicado.
 
 Se a porta 5434 ou 9000 já estiver ocupada na sua máquina, ajuste `POSTGRES_PORT` / `MINIO_PORT` no
 `.env` — `DATABASE_URL` precisa acompanhar a mudança.

@@ -36,7 +36,6 @@ export const messages = {
       listIsEquivalent: 'O mapa mostra os mesmos pontos de venda da lista.',
       zoomIn: 'Aproximar',
       zoomOut: 'Afastar',
-      radiusArea: 'Área da busca',
       attribution:
         '&copy; colaboradores do <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     },
@@ -81,7 +80,6 @@ export const messages = {
     about: 'Sobre a peça',
     whereToBuy: 'Onde comprar',
     noPhoto: 'Esta peça ainda não tem foto.',
-    seeProduct: (name: string) => `Ver a peça ${name}`,
     metaDescription: (name: string, artisanName: string) =>
       `${name}, feita à mão por ${artisanName}. Fale direto com quem faz e saiba onde comprar.`,
   },
@@ -99,6 +97,10 @@ export const messages = {
   notFound: {
     title: 'Página não encontrada',
     description: 'O endereço que você abriu não existe ou foi removido.',
+  },
+  offline: {
+    title: 'Sem internet',
+    description: 'Não deu para abrir esta página agora. Quando a internet voltar, tente de novo.',
   },
   auth: {
     cpf: 'CPF',
@@ -146,6 +148,32 @@ export const messages = {
     optional: 'Opcional',
     greeting: (name: string) => `Olá, ${name}.`,
     myPublicPage: 'Ver minha página',
+    overview: {
+      lead: 'Daqui você cuida da sua página: onde você vende e o que você faz.',
+      salesPointCount: (count: number) =>
+        count === 1 ? 'Você vende em 1 ponto.' : `Você vende em ${count} pontos.`,
+      productCount: (count: number) =>
+        count === 1 ? 'Você tem 1 peça publicada.' : `Você tem ${count} peças publicadas.`,
+      profileIncomplete: 'Conte seu ofício e sua cidade: é o que aparece primeiro na sua busca.',
+      seeMyPage: 'É assim que as pessoas veem você:',
+    },
+    profile: {
+      title: 'Meu perfil',
+      lead: 'O que o visitante lê na sua página.',
+      saved: 'Perfil salvo.',
+      craft: 'Seu ofício',
+      craftHint: 'Em poucas palavras. Por exemplo: cerâmica utilitária.',
+      city: 'Sua cidade',
+      story: 'Sua história',
+      storyHint: 'Conte como você aprendeu e há quanto tempo trabalha com isso.',
+      publicPhone: 'Celular para o cliente chamar',
+      publicPhoneHint: 'É o número que aparece no botão do WhatsApp. Pode ser outro.',
+      sicab: 'Registro de artesão (SICAB)',
+      sicabHint: 'Se você tiver. Aparece como informação, e nada aqui confere esse número.',
+      submit: 'Salvar meu perfil',
+      nameFixed: (name: string) =>
+        `Sua página é de ${name} e o endereço dela não muda, para não quebrar o link de quem já tem.`,
+    },
     whereISell: {
       title: 'Onde eu vendo',
       lead: 'É assim que as pessoas encontram você no mapa.',
@@ -211,7 +239,6 @@ export const messages = {
       photoReady: 'Foto pronta para subir.',
       photoPreparing: 'Preparando a foto...',
       photoFailed: 'Não conseguimos ler esta foto. Tente tirar outra.',
-      currentPhoto: 'Foto de agora',
       replacePhoto: 'Trocar a foto',
       alt: 'Descreva a foto',
       altHint: 'Para quem não enxerga. Por exemplo: moringa de barro sobre uma mesa de madeira.',
@@ -223,8 +250,5 @@ export const messages = {
       removeConfirm: 'Sim, tirar a peça',
       keep: 'Não, continuar com a peça',
     },
-  },
-  errors: {
-    unexpected: 'Algo deu errado. Tente de novo.',
   },
 } as const

@@ -43,4 +43,20 @@ test.describe('página inicial', () => {
 
     expect(results.violations).toEqual([])
   })
+
+  /**
+   * The page the service worker serves when a navigation finds no connection. It is reached from
+   * cache, with no data and no images, and is the one screen a visitor sees at their worst moment.
+   */
+  test('a tela de sem internet não tem violações de acessibilidade WCAG A/AA', async ({ page }) => {
+    await page.goto('/offline')
+
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Sem internet')
+
+    const results = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
+      .analyze()
+
+    expect(results.violations).toEqual([])
+  })
 })

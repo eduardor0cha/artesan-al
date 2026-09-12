@@ -4,15 +4,19 @@ import { randomUUID } from 'node:crypto'
 
 import { sql } from 'drizzle-orm'
 
+import { auth } from '../auth/better-auth'
 import { artisanSalesPoints, artisans, products, salesPoints, user } from './schema'
 import { db, sql as client } from './client'
+import { DEMO_ARTISAN } from './demo-account'
 
 /**
- * Fictional artisans at geographically plausible locations in Alagoas. Enough content that any
- * screen built on top of this scaffold has something to render, and that a map screenshot for the
- * paper looks like the real thing.
+ * Fictional artisans at geographically plausible locations in Alagoas. Enough content that every
+ * screen has something to render, and that a map screenshot for the paper looks like the real
+ * thing.
  *
- * Passwords are not set: these accounts exist to populate the catalogue, not to be logged into.
+ * One of them — the artisan matching `DEMO_ARTISAN.slug` — gets real credentials, so the panel can
+ * be demonstrated on an account that already sells somewhere and has a catalogue. The others are
+ * profiles only: they populate the public side and are not meant to be signed in to.
  */
 const seedData = [
   {
@@ -143,17 +147,12 @@ async function seed() {
   `)
 
   for (const entry of seedData) {
-    const userId = randomUUID()
     const artisanId = randomUUID()
     const salesPointId = randomUUID()
-
-    await db.insert(user).values({
-      id: userId,
-      name: entry.artisan.name,
-      // Sign-up synthesises an address from the CPF; the seed follows the same shape.
-      email: `${entry.artisan.slug}@local.artesanal`,
-      emailVerified: false,
-    })
+    const userId =
+      entry.artisan.slug === DEMO_ARTISAN.slug
+        ? await createDemoAccount(entry.artisan.publicPhone)
+        : await createProfileOnlyAccount(entry.artisan.name, entry.artisan.slug)
 
     await db.insert(artisans).values({ id: artisanId, userId, ...entry.artisan })
 
@@ -178,6 +177,41 @@ async function seed() {
   }
 
   console.info(`\n${seedData.length} artesãos semeados.`)
+  console.info(`Conta de demonstração: CPF ${DEMO_ARTISAN.cpf}, senha ${DEMO_ARTISAN.password}`)
+}
+
+/**
+ * Through Better Auth rather than by hand: the password hash is its format, and a row written
+ * around it would be a login that fails only when someone tries it. This is the same call the
+ * sign-up action makes, which also keeps the seed honest about the account shape the app expects.
+ */
+async function createDemoAccount(phone: string): Promise<string> {
+  const created = await auth.api.signUpEmail({
+    body: {
+      name: DEMO_ARTISAN.name,
+      email: `${DEMO_ARTISAN.cpf}@local.artesanal`,
+      password: DEMO_ARTISAN.password,
+      username: DEMO_ARTISAN.cpf,
+      phoneNumber: phone,
+    },
+  })
+
+  return created.user.id
+}
+
+/** No credentials: these accounts exist to own a public profile, not to be signed in to. */
+async function createProfileOnlyAccount(name: string, slug: string): Promise<string> {
+  const id = randomUUID()
+
+  await db.insert(user).values({
+    id,
+    name,
+    // Sign-up synthesises an address from the CPF; with no CPF here, the slug plays that part.
+    email: `${slug}@local.artesanal`,
+    emailVerified: false,
+  })
+
+  return id
 }
 
 seed()

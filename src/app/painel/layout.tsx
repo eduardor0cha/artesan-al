@@ -29,6 +29,13 @@ export default async function PanelLayout({ children }: LayoutProps<'/painel'>) 
 
           <nav aria-label={messages.panel.title} className="flex flex-wrap items-center gap-2">
             <Link
+              href={routes.panel}
+              className="min-h-11 content-center px-2 text-emerald-800 underline underline-offset-4"
+            >
+              {messages.panel.title}
+            </Link>
+
+            <Link
               href={routes.artisan(artisan.slug)}
               className="min-h-11 content-center px-2 text-emerald-800 underline underline-offset-4"
             >

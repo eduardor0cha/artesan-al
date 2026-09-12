@@ -139,6 +139,16 @@ test.describe('páginas públicas', () => {
 
     expect(await violationsOn(page)).toEqual([])
   })
+
+  /** Reached by a link that went stale, which is how public links get shared here. */
+  test('a página de não encontrado não tem violações de acessibilidade WCAG A/AA', async ({
+    page,
+  }) => {
+    await page.goto('/artesaos/nao-existe')
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+
+    expect(await violationsOn(page)).toEqual([])
+  })
 })
 
 async function violationsOn(page: Page) {

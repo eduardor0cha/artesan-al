@@ -6,8 +6,9 @@ import { alertOn } from './support/screen'
 
 /**
  * The artisan's way in: create an account with CPF and password, leave, come back, and ask for a
- * code when the password is gone. Every account here is created by the test itself — sign-up is
- * the only door, and there is no fixture account in the seed yet.
+ * code when the password is gone. Every account here is created by the test itself: the seed's
+ * demonstration account exists, but signing out of it and changing its password is exactly what
+ * would make a demonstration fail. `perfil.spec.ts` only reads it.
  */
 test.describe('conta do artesão', () => {
   test('um CPF novo cria conta e cai no primeiro passo guiado', async ({ page }) => {

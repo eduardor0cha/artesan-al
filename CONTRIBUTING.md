@@ -58,6 +58,10 @@ afirma — quem precisa de um ponto já cadastrado cria o seu, numa área vazia 
 reaproveitar a feira do seed. Rodando localmente várias vezes, vale um `pnpm db:seed` antes: ele
 trunca e refaz os dados de demonstração.
 
+A única conta do seed com senha é a de demonstração (`src/infrastructure/db/demo-account.ts`), e os
+testes só a leem: trocar a senha dela ou o que ela publica é justamente o que faria uma
+demonstração falhar na hora da avaliação.
+
 ## Banco de dados
 
 Schema em `src/infrastructure/db/schema/`, migrações geradas com `pnpm db:generate` e versionadas

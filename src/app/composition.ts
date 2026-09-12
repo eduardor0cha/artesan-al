@@ -1,5 +1,6 @@
 import { RequestPasswordOtp, ResetPasswordWithOtp } from '@/application/artisan/recover-password'
 import { SignUpArtisan } from '@/application/artisan/sign-up-artisan'
+import { UpdateArtisanProfile } from '@/application/artisan/update-artisan-profile'
 import { ViewArtisanProfile } from '@/application/artisan/view-artisan-profile'
 import { findOwnProduct } from '@/application/product/artisan-product'
 import { withPhoto, type ProductWithPhoto } from '@/application/product/product-with-photo'
@@ -61,6 +62,10 @@ export function viewProduct(): ViewProduct {
 
 export function signUpArtisan(): SignUpArtisan {
   return new SignUpArtisan(artisans, accounts)
+}
+
+export function updateArtisanProfile(): UpdateArtisanProfile {
+  return new UpdateArtisanProfile(artisans)
 }
 
 export function requestPasswordOtp(): RequestPasswordOtp {

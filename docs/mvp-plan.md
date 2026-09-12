@@ -195,4 +195,4 @@ avaliação e para as capturas do artigo.
 - [x] Fatia 3 — Conta do artesão
 - [x] Fatia 4 — Onde eu vendo
 - [x] Fatia 5 — Catálogo
-- [ ] Fatia 6 — Acabamento
+- [x] Fatia 6 — Acabamento

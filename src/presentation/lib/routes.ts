@@ -14,6 +14,7 @@ export const routes = {
 
   /** The artisan's own area. Everything under it requires a session. */
   panel: '/painel',
+  profile: '/painel/perfil',
   whereISell: '/painel/onde-vendo',
   newSalesPoint: '/painel/onde-vendo/novo',
   myProducts: '/painel/produtos',

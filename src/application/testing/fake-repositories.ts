@@ -58,8 +58,13 @@ export class FakeArtisanRepository implements ArtisanRepository {
     return Promise.resolve(this.sellersByPoint[salesPointId] ?? [])
   }
 
+  /** Upsert, like the real repository: the panel saves a profile that already exists. */
   save(artisan: Artisan): Promise<void> {
-    this.artisans.push(artisan)
+    const at = this.artisans.findIndex((stored) => stored.id === artisan.id)
+
+    if (at === -1) this.artisans.push(artisan)
+    else this.artisans[at] = artisan
+
     return Promise.resolve()
   }
 }
