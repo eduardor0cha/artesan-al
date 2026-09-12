@@ -4,6 +4,17 @@ import type { ImageStorage, StoredImage } from '@/application/ports/image-storag
 
 import { serverEnv } from '../config/env'
 
+/** The bucket to talk to. Read from the environment in the app; handed over by the tests. */
+export type S3ImageStorageConfig = {
+  endpoint: string
+  region: string
+  bucket: string
+  accessKeyId: string
+  secretAccessKey: string
+  /** Where the browser fetches an object from, which is not always where this client writes it. */
+  publicUrl: string
+}
+
 /**
  * Talks to MinIO locally and to any S3-compatible service (R2, S3, Supabase Storage) in
  * production — the difference is the value of S3_ENDPOINT, not this code.
@@ -13,22 +24,20 @@ export class S3ImageStorage implements ImageStorage {
   private readonly bucket: string
   private readonly publicBaseUrl: string
 
-  constructor() {
-    const env = serverEnv()
-
+  constructor(config: S3ImageStorageConfig = configFromEnv()) {
     this.client = new S3Client({
-      endpoint: env.S3_ENDPOINT,
-      region: env.S3_REGION,
+      endpoint: config.endpoint,
+      region: config.region,
       credentials: {
-        accessKeyId: env.S3_ACCESS_KEY_ID,
-        secretAccessKey: env.S3_SECRET_ACCESS_KEY,
+        accessKeyId: config.accessKeyId,
+        secretAccessKey: config.secretAccessKey,
       },
       // MinIO serves buckets as a path segment rather than a subdomain.
       forcePathStyle: true,
     })
 
-    this.bucket = env.S3_BUCKET
-    this.publicBaseUrl = env.S3_PUBLIC_URL.replace(/\/$/, '')
+    this.bucket = config.bucket
+    this.publicBaseUrl = config.publicUrl.replace(/\/$/, '')
   }
 
   async upload({
@@ -58,5 +67,18 @@ export class S3ImageStorage implements ImageStorage {
 
   publicUrl(key: string): string {
     return `${this.publicBaseUrl}/${key}`
+  }
+}
+
+function configFromEnv(): S3ImageStorageConfig {
+  const env = serverEnv()
+
+  return {
+    endpoint: env.S3_ENDPOINT,
+    region: env.S3_REGION,
+    bucket: env.S3_BUCKET,
+    accessKeyId: env.S3_ACCESS_KEY_ID,
+    secretAccessKey: env.S3_SECRET_ACCESS_KEY,
+    publicUrl: env.S3_PUBLIC_URL,
   }
 }

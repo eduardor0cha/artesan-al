@@ -7,7 +7,8 @@ import {
   FakeSalesPointRepository,
 } from '../testing/fake-repositories'
 import { anArtisan, aProduct, aProductImage, aSalesPoint } from '../testing/fixtures'
-import { PRODUCT_NOT_FOUND, ViewProduct } from './view-product'
+import { PRODUCT_NOT_FOUND } from './artisan-product'
+import { ViewProduct } from './view-product'
 
 describe('ViewProduct', () => {
   const maria = anArtisan({ id: 'artisan-1' })

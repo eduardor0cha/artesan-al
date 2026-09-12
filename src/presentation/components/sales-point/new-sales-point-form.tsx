@@ -55,14 +55,14 @@ export function NewSalesPointForm({ latitude, longitude, action }: NewSalesPoint
       <TextField
         id="sales-point-address"
         name="address"
-        label={`${messages.panel.newSalesPoint.address} (${messages.panel.newSalesPoint.optional})`}
+        label={`${messages.panel.newSalesPoint.address} (${messages.panel.optional})`}
         hint={messages.panel.newSalesPoint.addressHint}
       />
 
       <TextField
         id="sales-point-opening-hours"
         name="openingHours"
-        label={`${messages.panel.newSalesPoint.openingHours} (${messages.panel.newSalesPoint.optional})`}
+        label={`${messages.panel.newSalesPoint.openingHours} (${messages.panel.optional})`}
         hint={messages.panel.newSalesPoint.openingHoursHint}
       />
 

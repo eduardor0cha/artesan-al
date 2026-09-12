@@ -7,6 +7,7 @@ import type { ArtisanRepository } from '../ports/artisan.repository'
 import type { ImageStorage } from '../ports/image-storage'
 import type { ProductRepository } from '../ports/product.repository'
 import type { SalesPointRepository } from '../ports/sales-point.repository'
+import { PRODUCT_NOT_FOUND } from './artisan-product'
 import { withPhoto, type ProductWithPhoto } from './product-with-photo'
 
 export type ViewProductOutput = ProductWithPhoto & {
@@ -14,8 +15,6 @@ export type ViewProductOutput = ProductWithPhoto & {
   /** Where the piece can be bought: the points where its maker currently sells. */
   readonly salesPoints: readonly SalesPoint[]
 }
-
-export const PRODUCT_NOT_FOUND = 'product.not_found'
 
 /**
  * A single piece, on the page whose link gets pasted into a conversation. It carries who made it

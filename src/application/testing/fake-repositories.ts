@@ -65,7 +65,7 @@ export class FakeArtisanRepository implements ArtisanRepository {
 }
 
 export class FakeProductRepository implements ProductRepository {
-  constructor(private readonly products: Product[] = []) {}
+  constructor(readonly products: Product[] = []) {}
 
   findById(id: ProductId): Promise<Product | null> {
     return Promise.resolve(this.products.find((product) => product.id === id) ?? null)
@@ -79,12 +79,21 @@ export class FakeProductRepository implements ProductRepository {
     return Promise.resolve([])
   }
 
+  /** Upsert, like the real repository: the panel saves a piece it has already published. */
   save(product: Product): Promise<void> {
-    this.products.push(product)
+    const at = this.products.findIndex((stored) => stored.id === product.id)
+
+    if (at === -1) this.products.push(product)
+    else this.products[at] = product
+
     return Promise.resolve()
   }
 
-  delete(): Promise<void> {
+  delete(id: ProductId): Promise<void> {
+    const at = this.products.findIndex((product) => product.id === id)
+
+    if (at !== -1) this.products.splice(at, 1)
+
     return Promise.resolve()
   }
 }
@@ -181,13 +190,28 @@ export class FakeArtisanAccountGateway implements ArtisanAccountGateway {
 
 /** Mirrors how `S3ImageStorage` builds a public URL, without reaching for configuration. */
 export class FakeImageStorage implements ImageStorage {
+  /** What went into the bucket, so a test can assert the bytes were sent before the row. */
+  readonly uploaded: { key: string; contentType: string; bytes: number }[] = []
+  readonly deleted: string[] = []
+
   constructor(private readonly baseUrl = 'https://fotos.exemplo/artesanal') {}
 
-  upload({ key }: { key: string }): Promise<StoredImage> {
+  upload({
+    key,
+    body,
+    contentType,
+  }: {
+    key: string
+    body: Uint8Array | Buffer
+    contentType: string
+  }): Promise<StoredImage> {
+    this.uploaded.push({ key, contentType, bytes: body.byteLength })
+
     return Promise.resolve({ key })
   }
 
-  delete(): Promise<void> {
+  delete(key: string): Promise<void> {
+    this.deleted.push(key)
     return Promise.resolve()
   }
 

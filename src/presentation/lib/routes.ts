@@ -16,4 +16,7 @@ export const routes = {
   panel: '/painel',
   whereISell: '/painel/onde-vendo',
   newSalesPoint: '/painel/onde-vendo/novo',
+  myProducts: '/painel/produtos',
+  newProduct: '/painel/produtos/nova-peca',
+  editProduct: (id: string) => `/painel/produtos/${id}`,
 } as const

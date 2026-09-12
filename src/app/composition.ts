@@ -1,6 +1,11 @@
 import { RequestPasswordOtp, ResetPasswordWithOtp } from '@/application/artisan/recover-password'
 import { SignUpArtisan } from '@/application/artisan/sign-up-artisan'
 import { ViewArtisanProfile } from '@/application/artisan/view-artisan-profile'
+import { findOwnProduct } from '@/application/product/artisan-product'
+import { withPhoto, type ProductWithPhoto } from '@/application/product/product-with-photo'
+import { PublishProduct } from '@/application/product/publish-product'
+import { RemoveProduct } from '@/application/product/remove-product'
+import { UpdateProduct } from '@/application/product/update-product'
 import { ViewProduct } from '@/application/product/view-product'
 import { FindNearbySalesPointsToReuse } from '@/application/sales-point/find-nearby-sales-points-to-reuse'
 import { LinkArtisanToSalesPoint } from '@/application/sales-point/link-artisan-to-sales-point'
@@ -78,10 +83,22 @@ export function linkArtisanToSalesPoint(): LinkArtisanToSalesPoint {
   return new LinkArtisanToSalesPoint(salesPoints, salesPointLinks)
 }
 
+export function publishProduct(): PublishProduct {
+  return new PublishProduct(products, images())
+}
+
+export function updateProduct(): UpdateProduct {
+  return new UpdateProduct(products, images())
+}
+
+export function removeProduct(): RemoveProduct {
+  return new RemoveProduct(products, images())
+}
+
 /**
- * Two lookups the panel makes on its own. They orchestrate nothing — the session hands over an
- * account, and the screen needs the profile behind it and where that profile sells — so they stay
- * here instead of becoming use cases with a single line each.
+ * The lookups the panel makes on its own. They orchestrate nothing — the session hands over an
+ * account, and the screen needs the profile behind it, where that profile sells and what it has
+ * published — so they stay here instead of becoming use cases with a single line each.
  */
 export function findArtisanOfAccount(userId: string): Promise<Artisan | null> {
   return artisans.findByUserId(userId)
@@ -89,4 +106,20 @@ export function findArtisanOfAccount(userId: string): Promise<Artisan | null> {
 
 export function findSalesPointsOfArtisan(artisanId: string): Promise<SalesPoint[]> {
   return salesPoints.findByArtisan(artisanId)
+}
+
+export async function findProductsOfArtisan(artisanId: string): Promise<ProductWithPhoto[]> {
+  const catalogue = await products.findByArtisan(artisanId)
+
+  return catalogue.map((product) => withPhoto(product, images()))
+}
+
+/** Null covers both "no such piece" and "made by someone else": the edit screen says the same. */
+export async function findOwnProductOfArtisan(
+  artisanId: string,
+  productId: string,
+): Promise<ProductWithPhoto | null> {
+  const found = await findOwnProduct(products, artisanId, productId)
+
+  return found.ok ? withPhoto(found.value, images()) : null
 }

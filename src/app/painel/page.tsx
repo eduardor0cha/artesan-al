@@ -7,9 +7,8 @@ import { messages } from '@/presentation/messages/pt-BR'
 import { requireArtisan } from '../current-artisan'
 
 /**
- * The entrance to the artisan's own area. It offers the one thing that has to happen first: until
- * there is somewhere to find them, a profile shows a visitor nothing. The overview of the whole
- * account belongs to the last slice, once there is a catalogue to summarise.
+ * The entrance to the artisan's own area: where they sell, and what they make. The overview of the
+ * whole account belongs to the last slice, once there is something to summarise.
  */
 export default async function PanelPage() {
   await requireArtisan()
@@ -21,12 +20,18 @@ export default async function PanelPage() {
         <p className="text-stone-700">{messages.panel.whereISell.lead}</p>
       </header>
 
-      <Link
-        href={routes.whereISell}
-        className={buttonVariants({ size: 'large', className: 'self-start' })}
-      >
-        {messages.panel.whereISell.title}
-      </Link>
+      <div className="flex flex-wrap gap-3">
+        <Link href={routes.whereISell} className={buttonVariants({ size: 'large' })}>
+          {messages.panel.whereISell.title}
+        </Link>
+
+        <Link
+          href={routes.myProducts}
+          className={buttonVariants({ variant: 'secondary', size: 'large' })}
+        >
+          {messages.panel.myProducts.title}
+        </Link>
+      </div>
     </main>
   )
 }

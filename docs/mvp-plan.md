@@ -164,7 +164,8 @@ como o schema já exige, e o campo vem com exemplo de preenchimento.
 
 - Casos de uso `publish-product`, `update-product`, `remove-product`, falando com `ImageStorage`.
 - `presentation/components/product/PhotoInput.tsx` — captura, redução e pré-visualização.
-- Telas `/painel/produtos` e `/painel/produtos/nova-peca`.
+- Telas `/painel/produtos`, `/painel/produtos/nova-peca` e `/painel/produtos/[id]` — a edição
+  precisa de tela própria, e a remoção mora nela atrás de uma confirmação.
 - Teste de integração do `S3ImageStorage` contra um MinIO de Testcontainers.
 
 **Pronto quando:** uma peça publicada pelo painel aparece na página pública do artesão e na página
@@ -193,5 +194,5 @@ avaliação e para as capturas do artigo.
 - [x] Fatia 2 — Páginas públicas
 - [x] Fatia 3 — Conta do artesão
 - [x] Fatia 4 — Onde eu vendo
-- [ ] Fatia 5 — Catálogo
+- [x] Fatia 5 — Catálogo
 - [ ] Fatia 6 — Acabamento

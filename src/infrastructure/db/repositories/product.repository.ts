@@ -64,6 +64,8 @@ export class DrizzleProductRepository implements ProductRepository {
       name: product.name,
       description: product.description,
       priceCents: product.price?.cents ?? null,
+      // The column defaults only on insert, and this is an upsert: an edit has to stamp it here.
+      updatedAt: new Date(),
     }
 
     // The image list is replaced wholesale rather than reconciled row by row: a piece carries a

@@ -113,6 +113,21 @@ jobs:
       - name: Database schema and demo data
         run: pnpm db:migrate && pnpm db:seed
 
+      # Not a service container: MinIO needs its own command ("server /data"), which the services
+      # block cannot set. The bucket has to exist and be publicly readable before the app boots,
+      # the same bootstrap docker-compose does with the "storage-init" container.
+      - name: Object storage
+        run: |
+          docker run -d --name storage -p 9000:9000 \
+            -e MINIO_ROOT_USER=artesanal -e MINIO_ROOT_PASSWORD=artesanal123 \
+            minio/minio:latest server /data
+          until curl -sf http://127.0.0.1:9000/minio/health/live > /dev/null; do sleep 1; done
+          docker run --rm --network host minio/mc:latest sh -c "
+            mc alias set local http://127.0.0.1:9000 artesanal artesanal123 &&
+            mc mb --ignore-existing local/artesanal &&
+            mc anonymous set download local/artesanal
+          "
+
       - name: E2E tests
         run: pnpm test:e2e
 
