@@ -1,8 +1,11 @@
+import Link from 'next/link'
+
 import type { NearbySalesPointSummary } from '@/application/ports/sales-point-search.query'
 import { NearbySalesPointsMap } from '@/presentation/components/search/nearby-sales-points-map'
 import { RadiusFilter } from '@/presentation/components/search/radius-filter'
 import { SalesPointCard } from '@/presentation/components/search/sales-point-card'
 import { UseMyLocationButton } from '@/presentation/components/search/use-my-location-button'
+import { routes } from '@/presentation/lib/routes'
 import { parseSearchQuery } from '@/presentation/lib/search-url'
 import { messages } from '@/presentation/messages/pt-BR'
 
@@ -13,9 +16,19 @@ export default async function Home(props: PageProps<'/'>) {
 
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-8">
-      <header className="flex flex-col gap-1">
-        <h1 className="text-3xl font-semibold text-stone-900">{messages.app.name}</h1>
-        <p className="text-lg text-stone-700">{messages.app.tagline}</p>
+      <header className="flex flex-wrap items-start justify-between gap-3">
+        <div className="flex flex-col gap-1">
+          <h1 className="text-3xl font-semibold text-stone-900">{messages.app.name}</h1>
+          <p className="text-lg text-stone-700">{messages.app.tagline}</p>
+        </div>
+
+        {/* The only way an artisan reaches their own side of the app from the public search. */}
+        <Link
+          href={routes.signIn}
+          className="min-h-11 content-center text-emerald-800 underline underline-offset-4"
+        >
+          {messages.navigation.artisanArea}
+        </Link>
       </header>
 
       {result.ok ? (

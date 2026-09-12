@@ -8,6 +8,9 @@ export interface ArtisanRepository {
   /** The public profile page is reached by slug, never by id (ADR 0010). */
   findBySlug(slug: string): Promise<Artisan | null>
 
+  /** Who is signed in: the session carries the account id, and the panel works on the profile. */
+  findByUserId(userId: string): Promise<Artisan | null>
+
   /** Used on sign-up to reject a CPF that already has an account. */
   findByCpf(cpf: Cpf): Promise<Artisan | null>
 

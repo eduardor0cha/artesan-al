@@ -191,7 +191,7 @@ avaliação e para as capturas do artigo.
 
 - [x] Fatia 1 — Busca por proximidade
 - [x] Fatia 2 — Páginas públicas
-- [ ] Fatia 3 — Conta do artesão
+- [x] Fatia 3 — Conta do artesão
 - [ ] Fatia 4 — Onde eu vendo
 - [ ] Fatia 5 — Catálogo
 - [ ] Fatia 6 — Acabamento

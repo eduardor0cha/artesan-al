@@ -1,5 +1,6 @@
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
+import { nextCookies } from 'better-auth/next-js'
 import { admin, phoneNumber, username } from 'better-auth/plugins'
 
 import { db } from '../db/client'
@@ -30,11 +31,24 @@ export const auth = betterAuth({
     username(),
     phoneNumber({
       sendOTP: async ({ phoneNumber: destination, code }) => {
-        // No SMS/WhatsApp provider is wired up yet: in development the code goes to the server
-        // log, and a provider is plugged in here when there is budget for one.
-        console.info(`[auth] OTP ${code} para ${destination}`)
+        logOtp(destination, code)
+      },
+      sendPasswordResetOTP: async ({ phoneNumber: destination, code }) => {
+        logOtp(destination, code)
       },
     }),
     admin(),
+    // Applies the Set-Cookie headers of `auth.api` calls made from a Server Action, which is how
+    // every screen in this app signs in and out. It has to stay last in the list.
+    nextCookies(),
   ],
 })
+
+/**
+ * No SMS/WhatsApp provider is wired up yet: the code goes to the server log, and a provider is
+ * plugged into `sendOTP` when there is budget for one. The number is truncated because a log is
+ * the one place personal data leaks by accident.
+ */
+function logOtp(destination: string, code: string): void {
+  console.info(`[auth] código ${code} para o celular final ${destination.slice(-4)}`)
+}

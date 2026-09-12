@@ -110,6 +110,14 @@ describe('DrizzleArtisanRepository', () => {
     expect(artisan?.slug).toBe('maria-do-barro')
   })
 
+  /** What the panel does on every request: the session carries the account, not the profile. */
+  it('finds the profile that belongs to a signed-in account', async () => {
+    const artisan = await repository.findByUserId('user-maria')
+
+    expect(artisan?.id).toBe(mariaId)
+    expect(await repository.findByUserId('user-sem-perfil')).toBeNull()
+  })
+
   it('lists who currently sells at a point, in alphabetical order', async () => {
     const sellers = await repository.findBySalesPoint(fairId)
 

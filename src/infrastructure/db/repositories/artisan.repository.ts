@@ -27,6 +27,12 @@ export class DrizzleArtisanRepository implements ArtisanRepository {
     return rows.at(0) ? toArtisan(rows[0]!) : null
   }
 
+  async findByUserId(userId: string): Promise<Artisan | null> {
+    const rows = await this.db.select().from(artisans).where(eq(artisans.userId, userId)).limit(1)
+
+    return rows.at(0) ? toArtisan(rows[0]!) : null
+  }
+
   /**
    * The CPF lives in Better Auth's `user.username`, not in this table: the profile is what public
    * pages read, and a document number must never be one query away from them (LGPD).

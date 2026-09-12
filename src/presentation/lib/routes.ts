@@ -7,4 +7,11 @@ export const routes = {
   salesPoint: (id: string) => `/pontos-de-venda/${id}`,
   artisan: (slug: string) => `/artesaos/${slug}`,
   product: (id: string) => `/produtos/${id}`,
+
+  signIn: '/entrar',
+  signUp: '/criar-conta',
+  forgotPassword: '/esqueci-minha-senha',
+
+  /** The artisan's own area. Everything under it requires a session. */
+  panel: '/painel',
 } as const
