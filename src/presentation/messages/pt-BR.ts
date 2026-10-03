@@ -234,7 +234,7 @@ export const messages = {
       price: 'Preço em reais',
       priceHint: 'Escreva só o valor, como em 85,00. Deixe vazio para combinar com o cliente.',
       priceInvalid: 'Escreva o preço como em 85,00.',
-      photo: 'Foto da peça',
+      photo: 'Foto do produto',
       photoHint: 'Tire a foto com luz do dia. Ela é reduzida no seu aparelho antes de subir.',
       photoReady: 'Foto pronta para subir.',
       photoPreparing: 'Preparando a foto...',

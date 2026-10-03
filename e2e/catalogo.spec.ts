@@ -144,7 +144,7 @@ async function publishAPiece(page: Page, options: { price?: string } = {}): Prom
 
   if (options.price) await page.getByLabel(/Preço em reais/).fill(options.price)
 
-  await page.getByLabel(/Foto da peça/).setInputFiles(A_PHOTO)
+  await page.getByLabel(/Foto do produto/).setInputFiles(A_PHOTO)
 
   // The file only replaces what the field holds once the canvas has finished with it.
   await expect(page.getByText('Foto pronta para subir.')).toBeVisible()

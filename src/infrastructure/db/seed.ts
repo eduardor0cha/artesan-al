@@ -1,13 +1,33 @@
 import 'dotenv/config'
 
 import { randomUUID } from 'node:crypto'
+import { readFile } from 'node:fs/promises'
+import { resolve } from 'node:path'
 
 import { sql } from 'drizzle-orm'
 
 import { auth } from '../auth/better-auth'
-import { artisanSalesPoints, artisans, products, salesPoints, user } from './schema'
+import { S3ImageStorage } from '../storage/s3-image-storage'
+import { artisanSalesPoints, artisans, productImages, products, salesPoints, user } from './schema'
 import { db, sql as client } from './client'
 import { DEMO_ARTISAN } from './demo-account'
+
+/**
+ * Already reduced to 1200px JPEG at quality 0.8, the same treatment `PhotoInput` gives a photo in
+ * the browser before an artisan publishes it, so seeded pieces look like real ones.
+ */
+const SEED_PHOTOS_DIR = 'src/infrastructure/db/seed-photos'
+
+type SeedPhoto = { file: string; alt: string }
+
+type SeedProduct = {
+  name: string
+  description: string
+  priceCents: number
+  photo?: SeedPhoto
+}
+
+const images = new S3ImageStorage()
 
 /**
  * Fictional artisans at geographically plausible locations in Alagoas. Enough content that every
@@ -43,11 +63,20 @@ const seedData = [
         name: 'Moringa de barro',
         description: 'Peça torneada à mão, queimada em forno a lenha.',
         priceCents: 8500,
+        photo: {
+          file: 'moringa-de-barro.jpg',
+          alt: 'Moringa de barro com um copo encaixado na boca, pintada com um mandacaru florido, sobre um pires de barro numa mesa de madeira.',
+        },
       },
       {
         name: 'Jogo de alguidares',
-        description: 'Três peças em barro natural.',
+        description:
+          'Alguidares em barro, de vários tamanhos, naturais, vitrificados e pintados à mão.',
         priceCents: 12000,
+        photo: {
+          file: 'jogo-de-alguidares.jpg',
+          alt: 'Alguidares de barro de vários tamanhos sobre uma mesa de madeira: três empilhados, um grande, dois vitrificados em marrom-escuro e um pintado com um peixe.',
+        },
       },
     ],
   },
@@ -171,7 +200,12 @@ async function seed() {
 
     await db.insert(artisanSalesPoints).values({ artisanId, salesPointId })
 
-    await db.insert(products).values(entry.products.map((product) => ({ ...product, artisanId })))
+    const catalogue: readonly SeedProduct[] = entry.products
+    for (const { photo, ...product } of catalogue) {
+      const productId = randomUUID()
+      await db.insert(products).values({ id: productId, artisanId, ...product })
+      if (photo) await attachPhoto(productId, photo)
+    }
 
     console.info(`  ${entry.artisan.name} — ${entry.salesPoint.name}`)
   }
@@ -197,6 +231,24 @@ async function createDemoAccount(phone: string): Promise<string> {
   })
 
   return created.user.id
+}
+
+/**
+ * Through the same object store the app uses, so public pages build the photo URL exactly as they
+ * do for a piece an artisan published. The key is fixed per file instead of random: seeding again
+ * overwrites the object rather than leaving the previous one orphaned in the bucket.
+ */
+async function attachPhoto(productId: string, photo: SeedPhoto): Promise<void> {
+  const body = await readFile(resolve(process.cwd(), SEED_PHOTOS_DIR, photo.file))
+  const stored = await images.upload({
+    key: `produtos/seed-${photo.file}`,
+    body,
+    contentType: 'image/jpeg',
+  })
+
+  await db
+    .insert(productImages)
+    .values({ productId, storageKey: stored.key, alt: photo.alt, position: 0 })
 }
 
 /** No credentials: these accounts exist to own a public profile, not to be signed in to. */
