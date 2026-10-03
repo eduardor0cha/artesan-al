@@ -20,6 +20,7 @@ keywords:
   - PostGIS
   - inclusão digital
   - Alagoas
+license: MIT
+repository-code: 'https://github.com/eduardor0cha/artesan-al'
 version: 0.1.0
-date-released: '2026-09-11'
-# Pendentes: `license` (ver README) e `repository-code`, quando houver um remoto público.
+date-released: '2026-10-03'

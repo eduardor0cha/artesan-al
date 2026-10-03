@@ -123,6 +123,5 @@ e nos testes E2E.
 
 ## Licença
 
-**Ainda não definida.** Sem um arquivo `LICENSE`, o padrão legal é "todos os direitos reservados" —
-ou seja, terceiros não podem reutilizar nem replicar o experimento. A decisão precisa ser tomada
-antes da submissão do artigo.
+[MIT](./LICENSE). A versão avaliada no artigo é a tag
+[`v0.1.0`](https://github.com/eduardor0cha/artesan-al/releases/tag/v0.1.0).
