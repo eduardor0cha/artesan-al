@@ -70,6 +70,11 @@ por `pnpm db:seed` e não servem para nenhum ambiente publicado.
 Se a porta 5434 ou 9000 já estiver ocupada na sua máquina, ajuste `POSTGRES_PORT` / `MINIO_PORT` no
 `.env` — `DATABASE_URL` precisa acompanhar a mudança.
 
+O MinIO vem da imagem da Chainguard (`cgr.dev/chainguard/minio`), porque as imagens `minio/minio` e
+`minio/mc` saíram do Docker Hub. Se você montou o ambiente antes dessa troca, o armazenamento passa
+a usar um volume novo, vazio: rode `pnpm db:seed` para as fotos de demonstração voltarem, e
+`docker volume rm artesan-al_storage-data` para liberar o volume antigo.
+
 ## Scripts
 
 | Comando                 | O que faz                                                    |
