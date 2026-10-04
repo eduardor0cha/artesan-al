@@ -20,7 +20,9 @@ services:
       retries: 10
 
   storage:
-    image: minio/minio:latest
+    # minio/minio is gone from Docker Hub and quay.io needs a login; Chainguard rebuilds MinIO from
+    # source. The -dev variant is the one that ships the mc used by the healthcheck.
+    image: cgr.dev/chainguard/minio:latest-dev
     container_name: artesanal-storage
     command: server /data --console-address ":9001"
     environment:
@@ -30,7 +32,7 @@ services:
       - '${MINIO_PORT:-9000}:9000'
       - '${MINIO_CONSOLE_PORT:-9001}:9001'
     volumes:
-      - storage-data:/data
+      - storage-objects:/data
     healthcheck:
       test: ['CMD', 'mc', 'ready', 'local']
       interval: 5s
@@ -40,7 +42,7 @@ services:
   # One-shot container: creates the bucket and makes product photos publicly readable,
   # so the app never has to bootstrap its own storage on boot.
   storage-init:
-    image: minio/mc:latest
+    image: cgr.dev/chainguard/minio-client:latest-dev
     depends_on:
       storage:
         condition: service_healthy
@@ -53,4 +55,6 @@ services:
 
 volumes:
   db-data:
-  storage-data:
+  # Not "storage-data": that volume was written as root by the old image, and the Chainguard one
+  # runs as UID 65532 and cannot write to it. A new name gives every machine a fresh volume.
+  storage-objects:

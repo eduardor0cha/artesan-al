@@ -15,7 +15,8 @@ import { S3ImageStorage, type S3ImageStorageConfig } from './s3-image-storage'
  * this class builds is the one a browser can actually fetch without credentials — a product photo
  * is read by visitors who never sign in.
  */
-const MINIO_IMAGE = process.env.MINIO_IMAGE ?? 'minio/minio:latest'
+// minio/minio is gone from Docker Hub; Chainguard's build has the same entrypoint and health route.
+const MINIO_IMAGE = process.env.MINIO_IMAGE ?? 'cgr.dev/chainguard/minio:latest'
 const BUCKET = 'artesanal'
 const ACCESS_KEY = 'artesanal'
 const SECRET_KEY = 'artesanal123'

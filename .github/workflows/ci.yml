@@ -12,6 +12,11 @@ concurrency:
 env:
   # Official postgis/postgis publishes amd64 only; this multi-arch build works on every runner.
   POSTGIS_IMAGE: imresamu/postgis:17-3.5
+  # MinIO stopped publishing minio/minio and minio/mc on Docker Hub, and quay.io needs a login.
+  # Chainguard rebuilds both from source; its free tier only ships the "latest" tags. The client
+  # needs the -dev variant, the only one with a shell to chain the bootstrap commands.
+  MINIO_IMAGE: cgr.dev/chainguard/minio:latest
+  MINIO_CLIENT_IMAGE: cgr.dev/chainguard/minio-client:latest-dev
 
 jobs:
   quality:
@@ -110,23 +115,24 @@ jobs:
       - name: Install Playwright browser
         run: pnpm exec playwright install --with-deps chromium
 
-      - name: Database schema and demo data
-        run: pnpm db:migrate && pnpm db:seed
-
       # Not a service container: MinIO needs its own command ("server /data"), which the services
-      # block cannot set. The bucket has to exist and be publicly readable before the app boots,
-      # the same bootstrap docker-compose does with the "storage-init" container.
+      # block cannot set. The bucket has to exist and be publicly readable before the seed uploads
+      # the demo photos, the same bootstrap docker-compose does with the "storage-init" container.
       - name: Object storage
         run: |
           docker run -d --name storage -p 9000:9000 \
             -e MINIO_ROOT_USER=artesanal -e MINIO_ROOT_PASSWORD=artesanal123 \
-            minio/minio:latest server /data
-          until curl -sf http://127.0.0.1:9000/minio/health/live > /dev/null; do sleep 1; done
-          docker run --rm --network host minio/mc:latest sh -c "
+            "$MINIO_IMAGE" server /data
+          # Bounded, so an image that stops booting fails the step instead of hanging the job.
+          timeout 60 sh -c 'until curl -sf http://127.0.0.1:9000/minio/health/live > /dev/null; do sleep 1; done'
+          docker run --rm --network host --entrypoint sh "$MINIO_CLIENT_IMAGE" -c "
             mc alias set local http://127.0.0.1:9000 artesanal artesanal123 &&
             mc mb --ignore-existing local/artesanal &&
             mc anonymous set download local/artesanal
           "
+
+      - name: Database schema and demo data
+        run: pnpm db:migrate && pnpm db:seed
 
       - name: E2E tests
         run: pnpm test:e2e
