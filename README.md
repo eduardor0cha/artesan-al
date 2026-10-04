@@ -129,4 +129,6 @@ e nos testes E2E.
 ## Licença
 
 [MIT](./LICENSE). A versão avaliada no artigo é a tag
-[`v0.1.0`](https://github.com/eduardor0cha/artesan-al/releases/tag/v0.1.0).
+[`v0.1.1`](https://github.com/eduardor0cha/artesan-al/releases/tag/v0.1.1). Ela tem o mesmo código
+de aplicação da `v0.1.0` e só troca as imagens do MinIO, que saíram do Docker Hub e impediam o
+ambiente de subir numa máquina nova.
